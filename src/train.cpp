@@ -1,10 +1,10 @@
 #include "../include/train.h"
 #include "../include/lexer.h"
 namespace sjtu {
-    bpt<Index20, Train> idToTrain;
-    bpt<Station, Index20> stationToID;
-    int addtrain(TrainID trainID, int stationNum, int seatNum, string stations, string prices, \
-                 string startTime, string travelTimes, string stopoverTimes, string saleDate, string typ) {
+    bpt<TrainID, Train> idToTrain;
+    bpt<Station, TrainID> stationToID;
+    int addtrain(TrainID trainID, int stationNum, int seatNum, const string& stations, const string& prices, \
+                 const string& startTime, const string& travelTimes, const string& stopoverTimes, const string& saleDate, const string& typ) {
         Train nw = idToTrain.find(trainID);
         if (!nw.trainID.empty()) return -1;
         nw.trainID = trainID;
@@ -24,12 +24,42 @@ namespace sjtu {
         nw.is_released = false;
         idToTrain.insert(trainID, nw);
         for (int i = 0; i < stationNum; i++) {
-            stationToID.insert(stations[i] , trainID);
+            stationToID.insert(stationName[i], trainID);
         }
         return 0;
     }
-    int deltrain() {
-        //TODO
+    int deltrain(TrainID id) {
+        Train nw = idToTrain.find(id);
+        if (nw.trainID.empty()) {//does not exist
+            return -1; 
+        }
+        if (nw.is_released == true) { //has been released
+            return -1;
+        }
+        idToTrain.del(id, nw);
+        for (int i = 0; i < nw.stationNum; i++) {
+            stationToID.del(nw.stations[i], id);
+        }
+        return 0;
+    }
+    int releasetrain(TrainID id) {
+        Train nw = idToTrain.find(id);
+        if (nw.trainID.empty()) {//does not exist
+            return -1; 
+        }
+        if (nw.is_released == true) { //has been released
+            return -1;
+        }
+        idToTrain.del(id, nw);
+        nw.is_released = true;
+        idToTrain.insert(id, nw);
+        return 0;
+    }
+    int querytrain(const string &date, TrainID id) {
+        Train nw = idToTrain.find(id);
+        if (nw.trainID.empty()) return -1;
+        int Date = proceedDate(date);
+        
         return 0;
     }
 }

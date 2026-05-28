@@ -29,20 +29,14 @@ namespace sjtu {
             typ = '\0';
         }
     };
-    class TrainKey {
-        Station start_station, end_station;
-        TrainKey() {
-            start_station = Index30("");
-            end_station = Index30("");
-        }
-    };
-    int addtrain(TrainID, int, int, string, string, string, string, string, string, string);
-    int deltrain();
-    int releasetrain();
-    int querytrain();
+    int addtrain(TrainID, int, int, const string&, const string&, const string&, const string&, \
+                 const string&, const string&, const string&);
+    int deltrain(TrainID);
+    int releasetrain(TrainID);
+    int querytrain(const string&, TrainID);
     int query_ticket();
     int query_transfer();
-    extern bpt<Index20, Train> idToTrain;
-    extern bpt<Station, Index20> stationToID;
+    extern bpt<TrainID, Train> idToTrain;
+    extern bpt<Station, TrainID> stationToID;
 }
 #endif
