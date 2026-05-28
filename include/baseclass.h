@@ -54,6 +54,8 @@ namespace sjtu {
     using Usrname = Index20;
     using Pwd = Index30;
     using Mail = Index30;
+    using TrainID = Index20;
+    using Station = Index30;
     template<int len>
     std::istream& operator >> (std::istream &in, Index<len> x) {
         in >> x.s;
@@ -64,30 +66,11 @@ namespace sjtu {
         out << x.s;
         return out;
     }
-    
-    struct Time {
-        int hour, minute;
-        Time (int hour = 0, int minute = 0) : hour(hour), minute(minute) {}
-        bool operator < (const Time &x) {
-            return hour < x.hour || (hour == x.hour && minute < x.minute);
-        }
-        Time operator + (int x) {
-            Time ret(hour, minute + x);
-            ret.hour += ret.minute / 60; 
-            ret.minute %= 10;
-            ret.hour %= 24;
-            return ret;
-        }
-        Time operator - (int x) {
-            Time ret(hour, minute - x);
-            ret.hour -=
-            ret.hour = (ret.hour % 24 + 24) % 24;
-            return ret;
-        }
-    };
-    struct Date {
-
-    };
-    
+    const int kMinPerHour = 60;
+    const int kMinPerDay = 1440;
+    extern int mon[12];
+    int proceedTime(const string&);
+    int proceedDate(const string&);
+    int getExactMin(int, int, int, int);
 } ;
 #endif

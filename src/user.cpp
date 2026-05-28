@@ -20,10 +20,13 @@ namespace sjtu {
             return -1;
         }
         User cur_user = nameToUser.find(cur);
-        if (cur_user.privilege <= privilege) {//failed case 2:
+        if (cur_user.privilege <= privilege) {//failed case 2: privilege not enough
             return -1;
         }
-        User nw;
+        User nw = nameToUser.find(usrname);
+        if (!nw.username.empty()) {//failed case 3: already exist
+            return -1;
+        }
         nw.username = usrname;
         nw.password = pwd;
         nw.name = name;
