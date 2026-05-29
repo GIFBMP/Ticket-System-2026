@@ -21,7 +21,7 @@ namespace sjtu {
         for (int i = 0; i < month - 1; i++) ret += mon[i];
         return (ret + day) * kMinPerDay + hour * kMinPerHour + minute;
     }
-    void putTime(int total_minute) {
+    void printTime(int total_minute) {
         int day = total_minute / kMinPerDay, hour = 0, month = 1;
         total_minute %= kMinPerDay;
         hour = total_minute % kMinPerHour;
@@ -32,5 +32,14 @@ namespace sjtu {
             else break;
         }
         std::cout << month << '-' << day << ' ' << hour << ':' << total_minute;
+    }
+    int min (int a, int b) {
+        return a < b ? a : b;
+    }
+    int max (int a, int b) {
+        return a > b ? a : b;
+    }
+    int getDate(int minute) {
+        return minute - minute % kMinPerDay;
     }
 }

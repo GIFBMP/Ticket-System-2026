@@ -28,14 +28,21 @@ namespace sjtu {
             is_released = false;
             typ = '\0';
         }
+        bool operator < (const Train &x) const {
+            return trainID < x.trainID;
+        }
+        bool operator <= (const Train &x) const {
+            return trainID <= x.trainID;
+        }
+        bool operator == (const Train &x) const {
+            return trainID == x.trainID;
+        }
     };
     int addtrain(TrainID, int, int, const string&, const string&, const string&, const string&, \
                  const string&, const string&, const string&);
     int deltrain(TrainID);
     int releasetrain(TrainID);
     int querytrain(const string&, TrainID);
-    int query_ticket();
-    int query_transfer();
     extern bpt<TrainID, Train> idToTrain;
     extern bpt<Station, TrainID> stationToID;
 }

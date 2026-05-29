@@ -19,7 +19,6 @@ namespace sjtu {
         fstream file;
         string file_name;
     public:
-        MemoryRiver() = default;
         void initialise(std::string FN = "") {
             if (FN != "")file_name = FN;
             file.open(file_name, std::ios::in | std::ios::out);
@@ -31,6 +30,10 @@ namespace sjtu {
             for (int i = 0; i < info_len; ++i) {
                 file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
             }
+        }
+        MemoryRiver() = default;
+        explicit MemoryRiver(string FN) {
+            if (FN != "") initialise(FN);
         }
         void exit() {
             file.close();
@@ -61,7 +64,7 @@ namespace sjtu {
             return index;
         }
         void read(T &t, const int idx) {
-            int pos = (idx - 1)* sizeofT + databegin;
+            int pos = (idx - 1) * sizeofT + databegin;
             file.seekg(pos, std::ios::beg);
             file.read(reinterpret_cast<char *>(&t), sizeofT);
         }
@@ -106,8 +109,15 @@ namespace sjtu {
             tr.get_info(rt, 1);
             //std::cerr << rt << '\n';
         }
+        void initialise(string FN = "") {
+            tr.initialise(FN);
+            tr.get_info(rt, 1);
+        }
         ~bpt() {
             tr.exit();   
+        }
+        void exit() {
+            tr.exit();
         }
         int lower_bound(const Node &nd, const ValuePair &x) {
             int l = 0, r = nd.sz - 1;
@@ -302,6 +312,7 @@ namespace sjtu {
                 for (int i = pos; i < block.sz && block.data[i].a == x; i++)
                     ret.push_back(block.data[i].b);
             }
+            return ret;
             //std::cout << '\n';
         }
         void del_adjust(Node &x, int id) {
@@ -495,7 +506,7 @@ namespace sjtu {
                 del_adjust(block, nw);
         }
         int getrt() {return rt;}
-        bool empty() {return tr.size() == 0;}
+        bool firstadd() {return tr.size() == 0;}
     };
 }
 #endif

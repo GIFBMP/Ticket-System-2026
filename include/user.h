@@ -18,6 +18,15 @@ namespace sjtu {
             mailaddr = Index30("");
             privilege = 0;
         }
+        bool operator < (const User &x) const {
+            return username < x.username;
+        }
+        bool operator <= (const User &x) const {
+            return username <= x.username;
+        }
+        bool operator == (const User &x) const {
+            return username == x.username;
+        }
     };
     extern bpt<Usrname, User> nameToUser;
     extern map<Usrname, bool> isLogin;

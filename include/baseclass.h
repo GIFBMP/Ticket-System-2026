@@ -68,9 +68,14 @@ namespace sjtu {
     }
     const int kMinPerHour = 60;
     const int kMinPerDay = 1440;
+    const int kInf = 2147483647;
     extern int mon[12];
     int proceedTime(const string&);
     int proceedDate(const string&);
     int getExactMin(int, int, int, int);
+    int getDate(int);
+    void printTime(int);
+    int min(int, int);
+    int max(int, int);
 } ;
 #endif

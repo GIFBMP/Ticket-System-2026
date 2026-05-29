@@ -3,10 +3,10 @@
 #include "../include/map.h"
 #include <iostream>
 namespace sjtu {
-    bpt<Usrname, User> nameToUser("User_File");
+    bpt<Usrname, User> nameToUser("Name_to_User_File");
     map<Usrname, bool> isLogin;
     int add_user(Usrname cur, Usrname usrname, Pwd pwd, Usrname name, Mail mailaddr, int privilege) {
-        if (nameToUser.empty()) {//first add: ignore cur and privilege
+        if (nameToUser.firstadd()) {//first add: ignore cur and privilege
             User nw;
             nw.username = usrname;
             nw.password = pwd;
@@ -68,6 +68,7 @@ namespace sjtu {
     }
     int modify_profile(Usrname cur, Usrname usrname, Pwd pwd, Usrname name, Mail mailaddr, int privilege = -1) {
         if (!isLogin.count(cur)) {
+            //std::cerr << "not login\n";
             return -1;
         }
         if (cur == usrname) {
@@ -83,6 +84,8 @@ namespace sjtu {
         User cur_user = nameToUser.find(cur);
         User nw = nameToUser.find(usrname);
         if (nw.username.empty() || cur_user.privilege <= nw.privilege) {
+            // if (nw.username.empty()) std::cerr << "not exist\n";
+            // else std::cerr << "not enough privilege\n";
             return -1;
         }
         nameToUser.del(usrname, nw);
@@ -91,6 +94,7 @@ namespace sjtu {
         if (!mailaddr.empty()) nw.mailaddr = mailaddr;
         if (privilege >= 0) nw.privilege = privilege;
         nameToUser.insert(usrname, nw);
+        std::cout << nw.username << ' ' << nw.name << ' ' << nw.mailaddr << ' ' << nw.privilege << '\n';
         return 0;
     }
 }
