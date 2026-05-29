@@ -12,6 +12,8 @@ void clear() {
     idToTrain.exit();
     stationToID.exit();
     nameToUser.exit();
+    dailySeat.exit();
+    remainSeats.exit();
     if (std::filesystem::exists("User_to_Ticket_File")) std::filesystem::remove("User_to_Ticket_File");
     if (std::filesystem::exists("Tickets_File")) std::filesystem::remove("Tickets_File");
     if (std::filesystem::exists("Train_to_Pending_Ticket_File")) std::filesystem::remove("Train_to_Pending_Ticket_File");
@@ -19,6 +21,8 @@ void clear() {
     if (std::filesystem::exists("ID_to_Train_File")) std::filesystem::remove("ID_to_Train_File");
     if (std::filesystem::exists("Station_to_ID_File")) std::filesystem::remove("Station_to_ID_File");
     if (std::filesystem::exists("Name_to_User_File")) std::filesystem::remove("Name_to_User_File");
+    if (std::filesystem::exists("Daily_Seat_File")) std::filesystem::remove("Daily_Seat_File");
+    if (std::filesystem::exists("Remain_Seats_File")) std::filesystem::remove("Remain_Seats_File");
     isLogin.clear();
     userToTicket.initialise("User_to_Ticket_File");
     tickets.initialise("Tickets_File");
@@ -27,11 +31,22 @@ void clear() {
     idToTrain.initialise("ID_to_Train_File");
     stationToID.initialise("Station_to_ID_File");
     nameToUser.initialise("Name_to_User_File");
+    dailySeat.initialise("Daily_Seat_File");
+    remainSeats.initialise("Remain_Seats_File");
 }
 int main() {
     //std::ios::sync_with_stdio(false);
     //std::cin.tie(0);
     //std::cout.tie(0);
+    userToTicket.initialise("User_to_Ticket_File");
+    tickets.initialise("Tickets_File");
+    trainToPendingTicket.initialise("Train_to_Pending_Ticket_File");
+    ticketToTrain.initialise("Ticket_to_Train_File");
+    idToTrain.initialise("ID_to_Train_File");
+    stationToID.initialise("Station_to_ID_File");
+    nameToUser.initialise("Name_to_User_File");
+    dailySeat.initialise("Daily_Seat_File");
+    remainSeats.initialise("Remain_Seats_File");
     clear();
     string s;
     vector<string> v;
@@ -106,8 +121,23 @@ int main() {
             if (modify_profile(cur, usrname, pwd, name, mailaddr, privilege) == -1) std::cout << "-1\n";
         }
         else if (v[1] == "add_train") {
-            std::cout << addtrain(v[3], stringtoint(v[5]), stringtoint(v[7]), v[9], v[11], 
-                                  v[13], v[15], v[17], v[19], v[21]) << '\n';
+            TrainID trainid;
+            int stationNum, seatNum;
+            string stations, prices, startTime, travelTimes, stopoverTimes, saleDate, typ;
+            for (int i = 2; i < len; i += 2) {
+                if (v[i] == "-i") trainid = v[i + 1];
+                if (v[i] == "-n") stationNum = stringtoint(v[i + 1]);
+                if (v[i] == "-m") seatNum = stringtoint(v[i + 1]);
+                if (v[i] == "-s") stations = v[i + 1];
+                if (v[i] == "-p") prices = v[i + 1];
+                if (v[i] == "-x") startTime = v[i + 1];
+                if (v[i] == "-t") travelTimes = v[i + 1];
+                if (v[i] == "-d") saleDate = v[i + 1];
+                if (v[i] == "-y") typ = v[i + 1];
+                if (v[i] == "-o") stopoverTimes = v[i + 1];
+            }
+            std::cout << addtrain(trainid, stationNum, seatNum, stations, prices, 
+                                  startTime, travelTimes, stopoverTimes, saleDate, typ) << '\n';
         }
         else if (v[1] == "delete_train") {
             std::cout << deltrain(v[3]) << '\n';
@@ -116,28 +146,67 @@ int main() {
             std::cout << releasetrain(v[3]) << '\n';
         }
         else if (v[1] == "query_train") {
-            if (querytrain(v[3], v[5]) == -1) std::cout << "-1\n";
+            TrainID trainid;
+            string date;
+            for (int i = 2; i < len; i += 2) {
+                if (v[i] == "-i") trainid = v[i + 1];
+                if (v[i] == "-d") date = v[i + 1];
+            }
+            if (querytrain(date, trainid) == -1) std::cout << "-1\n";
         }
         else if (v[1] == "query_ticket") {
+            Station st, ed;
+            string date;
             int typ = 0;
-            if (len >= 9) typ = (v[9] == "cost") ? 1 : 0;
-            query_ticket(v[3], v[5], v[7], typ);
+            for (int i = 2; i < len; i += 2) {
+                if (v[i] == "-s") st = v[i + 1];
+                if (v[i] == "-t") ed = v[i + 1];
+                if (v[i] == "-d") date = v[i + 1];
+                if (v[i] == "-p") typ = (v[i + 1] == "cost") ? 1 : 0;
+            }
+            query_ticket(st, ed, date, typ);
         }
         else if (v[1] == "query_transfer") {
+            Station st, ed;
+            string date;
             int typ = 0;
-            if (len >= 10) typ = (v[9] == "cost") ? 1 : 0;
-            query_transfer(v[3], v[5], v[7], typ);
+            for (int i = 2; i < len; i += 2) {
+                if (v[i] == "-s") st = v[i + 1];
+                if (v[i] == "-t") ed = v[i + 1];
+                if (v[i] == "-d") date = v[i + 1];
+                if (v[i] == "-p") typ = (v[i + 1] == "cost") ? 1 : 0;
+            }
+            query_transfer(st, ed, date, typ);
         }
         else if (v[1] == "buy_ticket") {
+            Usrname usrname;
+            TrainID trainid;
+            string date;
+            Station st, ed;
             bool typ = false;
-            if (len >= 16) typ = (v[16] == "true") ? true : false;
-            if (buy_ticket(v[3], v[5], v[7], stringtoint(v[9]), v[11], v[13], typ) == -1) std::cout << "-1\n";
+            int num;
+            for (int i = 2; i < len; i += 2) {
+                if (v[i] == "-u") usrname = v[i + 1];
+                if (v[i] == "-i") trainid = v[i + 1];
+                if (v[i] == "-f") st = v[i + 1];
+                if (v[i] == "-t") ed = v[i + 1];
+                if (v[i] == "-d") date = v[i + 1];
+                if (v[i] == "-q") typ = (v[i + 1] == "true") ? true : false;
+                if (v[i] == "-n") num = stringtoint(v[i + 1]);
+            }
+            if (buy_ticket(usrname, trainid, date, num, st, ed, typ) == -1) std::cout << "-1\n";
         }
         else if (v[1] == "query_order") {
             if (query_order(v[3]) == -1) std::cout << "-1\n";
         }
         else if (v[1] == "refund_ticket") {
-            std::cout << refund_ticket(v[3], stringtoint(v[5])) << '\n';
+            Usrname usr;
+            int pos;
+            for (int i = 2; i < len; i += 2) {
+                if (v[i] == "-u") usr = v[i + 1];
+                if (v[i] == "-n") pos = stringtoint(v[i + 1]);
+            }
+            std::cout << refund_ticket(usr, pos) << '\n';
         }
     }
     return 0;

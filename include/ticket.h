@@ -9,13 +9,14 @@ namespace sjtu {
     struct Ticket {
         Station startStation, endStation;
         TrainID trainID;
-        int startTime, endTime, timeStamp, ticketNum, ticketCost;
+        int startTime, endTime, timeStamp, ticketNum, ticketCost, date;
         TicketStatus status;
         Ticket() {
             startStation = endStation = Station("");
             trainID = TrainID("");
             startTime = endTime = timeStamp = ticketNum = 0;
             status = TicketStatus::PENDING;
+            date = 0;
         }
         bool operator < (const Ticket &other) {
             return timeStamp < other.timeStamp;
@@ -50,7 +51,7 @@ namespace sjtu {
     int query_order(Usrname);
     int refund_ticket(Usrname, int);
     extern bpt<Usrname, int> userToTicket;
-    extern bpt<TrainID, int> trainToPendingTicket;
+    extern bpt<TrainKey, int> trainToPendingTicket;
     extern MemoryRiver<Ticket, 0> tickets;
     extern MemoryRiver<TrainID, 0> ticketToTrain;
 }

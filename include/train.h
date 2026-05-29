@@ -9,7 +9,6 @@ namespace sjtu {
         TrainID trainID;
         int stationNum;
         Station stations[kMaxStation];
-        int seatNum[kMaxStation];
         int prices[kMaxStation];
         int startTime;
         int travelTimes[kMaxStation], stopoverTime[kMaxStation];
@@ -22,7 +21,6 @@ namespace sjtu {
             for (int i = 0; i < kMaxStation; i++) {
                 stations[i] = Index30("");
                 travelTimes[i] = stopoverTime[i] = 0;
-                seatNum[i] = 0;
             }
             startTime = 0;
             is_released = false;
@@ -38,6 +36,29 @@ namespace sjtu {
             return trainID == x.trainID;
         }
     };
+    struct TrainKey {
+        TrainID id;
+        int date;
+        TrainKey (TrainID x = TrainID(""), int y = 0) : id(x), date(y) {}
+        bool operator < (const TrainKey &x) const {
+            return id == x.id ? date < x.date : id < x.id;
+        }
+        bool operator <= (const TrainKey &x) const {
+            return id == x.id ? date <= x.date : id < x.id;
+        }
+        bool operator == (const TrainKey &x) const {
+            return id == x.id && date == x.date;
+        }
+    };
+    struct RemainSeat {
+        int seatNum[kMaxStation];
+        RemainSeat () {
+            for (int i = 0; i < kMaxStation; i++) {
+                seatNum[i] = 0;
+            }
+        }
+
+    };
     int addtrain(TrainID, int, int, const string&, const string&, const string&, const string&, \
                  const string&, const string&, const string&);
     int deltrain(TrainID);
@@ -45,5 +66,7 @@ namespace sjtu {
     int querytrain(const string&, TrainID);
     extern bpt<TrainID, Train> idToTrain;
     extern bpt<Station, TrainID> stationToID;
+    extern bpt<TrainKey, int> dailySeat;
+    extern MemoryRiver<RemainSeat, 0> remainSeats; 
 }
 #endif

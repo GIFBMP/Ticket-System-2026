@@ -14,7 +14,7 @@ namespace sjtu {
         int day = stringtoint(str.substr(3 , 2));
         int ret = 0;
         for (int i = 0; i < month - 1; i++) ret += mon[i];
-        return (ret + day) * kMinPerDay;
+        return (ret + day - 1) * kMinPerDay;
     }
     int getExactMin(int month, int day, int hour, int minute) {
         int ret = 0;
@@ -24,14 +24,21 @@ namespace sjtu {
     void printTime(int total_minute) {
         int day = total_minute / kMinPerDay, hour = 0, month = 1;
         total_minute %= kMinPerDay;
-        hour = total_minute % kMinPerHour;
+        hour = total_minute / kMinPerHour;
         total_minute %= kMinPerHour;
         day++;
         for (int i = 0; i < 12; i++) {
             if (day > mon[i]) day -= mon[i], month++;
             else break;
         }
-        std::cout << month << '-' << day << ' ' << hour << ':' << total_minute;
+        if (month < 10) std::cout << '0';
+        std::cout << month << '-';
+        if (day < 10) std::cout << '0';
+        std::cout << day << ' ';
+        if (hour < 10) std::cout << '0'; 
+        std::cout << hour << ':';
+        if (total_minute < 10) std::cout << '0';
+        std::cout << total_minute;
     }
     int min (int a, int b) {
         return a < b ? a : b;
