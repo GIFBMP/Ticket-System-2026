@@ -7,6 +7,7 @@ namespace sjtu {
     map<Usrname, bool> isLogin;
     int add_user(Usrname cur, Usrname usrname, Pwd pwd, Usrname name, Mail mailaddr, int privilege) {
         if (nameToUser.firstadd()) {//first add: ignore cur and privilege
+            //std::cout << "firstadd";
             User nw;
             nw.username = usrname;
             nw.password = pwd;
