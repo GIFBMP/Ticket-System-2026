@@ -217,6 +217,7 @@ namespace sjtu {
             }
             tmp2.ticketCost = 0;
             tmp2.ticketNum = kInf;
+            tmp2.trainID = x;
             for (int i = ed_pos - 1; ~i; i--) {
                 tmp2.startStation = nw.stations[i];
                 tmp2.endStation = ed;
