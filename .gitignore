@@ -1,2 +1,11 @@
 testcases/
 build/
+User_to_Ticket_File
+Tickets_File
+Train_to_Pending_Ticket_File
+Ticket_to_Train_File
+ID_to_Train_File
+Station_to_ID_File
+Name_to_User_File
+Daily_Seat_File
+Remain_Seats_File

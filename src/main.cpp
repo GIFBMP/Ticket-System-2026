@@ -47,7 +47,7 @@ int main() {
     nameToUser.initialise("Name_to_User_File");
     dailySeat.initialise("Daily_Seat_File");
     remainSeats.initialise("Remain_Seats_File");
-    clear();
+    //clear();
     string s;
     vector<string> v;
     while (getline(std::cin, s)) {

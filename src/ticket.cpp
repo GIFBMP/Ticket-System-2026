@@ -364,6 +364,8 @@ namespace sjtu {
         vector<int> orders = userToTicket.multifind(usr);
         int len = orders.size();
         if (ord > len) return -1;// ticket does not exist
+        // for (int i = 0; i < len; i++) std::cout << orders[i] << ' ';
+        // puts("");
         Ticket tmp;
         int pos = orders[len - ord];
         tickets.read(tmp, pos);
@@ -383,10 +385,12 @@ namespace sjtu {
             int st_pos = -1, ed_pos = -1;
             for (int i = 0; i < nw_train.stationNum; i++) {
                 if (nw_train.stations[i] == tmp.startStation) st_pos = i;
-                if (nw_train.stations[i] == tmp.startStation) ed_pos = i;
+                if (nw_train.stations[i] == tmp.endStation) ed_pos = i;
             }
             RemainSeat seat;
             int dayseat_id = dailySeat.find(TrainKey(id, tmp.date));
+            // printTime(tmp.date); std::cout << "???\n";
+            // std::cout << tmp.startStation << ' ' << tmp.endStation << '\n';
             remainSeats.read(seat, dayseat_id);
             for (int i = st_pos; i < ed_pos; i++) {
                 seat.seatNum[i] += tmp.ticketNum;
@@ -398,7 +402,7 @@ namespace sjtu {
                 st_pos = -1, ed_pos = -1;
                 for (int j = 0; j < nw_train.stationNum; j++) {
                     if (nw_train.stations[j] == tic.startStation) st_pos = j;
-                    if (nw_train.stations[j] == tic.startStation) ed_pos = j;
+                    if (nw_train.stations[j] == tic.endStation) ed_pos = j;
                 }
                 int remain_seat = kInf;
                 for (int j = st_pos; j < ed_pos; j++) {
@@ -415,7 +419,7 @@ namespace sjtu {
             }
             tmp.status = TicketStatus::REFUNDED;
             tickets.write(tmp, pos);
-            remainSeats.read(seat, dayseat_id);
+            remainSeats.write(seat, dayseat_id);
             //idToTrain.insert(id, nw_train);
         }
         return 0;
