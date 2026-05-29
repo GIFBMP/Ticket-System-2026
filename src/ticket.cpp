@@ -187,6 +187,7 @@ namespace sjtu {
                 vector<TrainID> trans = stationToID.multifind(nw.stations[i]);
                 tmp2.startStation = tmp1.endStation = nw.stations[i];
                 if (nw.stations[i] != ed) {
+                    Station tr_station = nw.stations[i];
                     for (auto y : trans) {
                         if (y == x) continue;
                         Train tr_train = idToTrain.find(y);
@@ -195,11 +196,11 @@ namespace sjtu {
                         tmp2.ticketCost = 0;
                         int tr_pos = -1, ed_pos = -1;
                         for (int j = 0; j < tr_train.stationNum; j++) {
-                            if (tr_train.stations[j] == nw.stations[i]) tr_pos = j;
+                            if (tr_train.stations[j] == tr_station) tr_pos = j;
                             if (tr_train.stations[j] == ed) ed_pos = j;
                         }
                         if (ed_pos == -1 || ed_pos <= tr_pos) continue; 
-                        int tr_time = 0;
+                        int tr_time = tr_train.startTime;
                         for (int j = 0; j < tr_train.stationNum; j++) {
                             if (j == ed_pos) {
                                 tmp2.endTime = tr_time;
@@ -207,17 +208,18 @@ namespace sjtu {
                             }
                             if (j > 0) tr_time += tr_train.stopoverTime[j];
                             if (j == tr_pos) tmp2.startTime = tr_time;
-                            tr_time += tr_train.travelTimes[i];
+                            tr_time += tr_train.travelTimes[j];
                             if (j >= tr_pos && j < ed_pos) {
                                 //tmp2.ticketNum = min(tmp2.ticketNum, nw.seatNum[j]);
-                                tmp2.ticketCost += nw.prices[j];
+                                tmp2.ticketCost += tr_train.prices[j];
                             }
                         }
                         if (tmp1.endTime <= tmp2.startTime + tr_train.saleEnd) {
-                            int extra_min = (tmp1.endTime - tmp2.startTime + kMinPerDay - 1) / kMinPerDay * kMinPerDay;
+                            int extra_min = ((tmp1.endTime - tmp2.startTime + kMinPerDay - 1) / kMinPerDay) * kMinPerDay;
                             //int tmp_train2 = tmp2.startTime;
                             tmp2.startTime += max(tr_train.saleStart, extra_min);
                             tmp2.endTime += max(tr_train.saleStart, extra_min);
+                            tmp2.endStation = ed;
                             int start_date2 = max(tr_train.saleStart, extra_min);
                             RemainSeat seat2;
                             remainSeats.read(seat2, dailySeat.find(TrainKey(y, start_date2)));
