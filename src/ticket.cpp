@@ -45,12 +45,10 @@ namespace sjtu {
         Ticket tic;
         tic.startStation = st;
         tic.endStation = ed;
-        //std::cout << typ << '\n';
         if (typ == 0) {//time
             priority_queue<Ticket, SortByTime> q;
             for (auto x : ret) {
                 Train nw = idToTrain.find(x);
-                
                 if (nw.is_released == false) continue;
                 int st_pos = -1, ed_pos = -1;
                 for (int i = 0; i < nw.stationNum; i++) {
@@ -79,18 +77,16 @@ namespace sjtu {
                 }
                 //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
                 int delta = tic.endTime - tic.startTime;
-                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
-                    int tmp = tic.startTime;
-                    tic.startTime = tic.startTime % kMinPerDay + Date;
-                    tic.endTime = tic.startTime + delta;
-                    int start_date = tic.startTime - tmp;
-                    RemainSeat seat;
-                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                    for (int i = st_pos; i < ed_pos; i++) {
-                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                    }
-                    q.push(tic);
+                int tmp = tic.startTime;
+                tic.startTime = tic.startTime % kMinPerDay + Date;
+                tic.endTime = tic.startTime + delta;
+                int start_date = tic.startTime - tmp;
+                RemainSeat seat;
+                remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
+                for (int i = st_pos; i < ed_pos; i++) {
+                    tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                 }
+                q.push(tic);
             }
             std::cout << q.size() << '\n';
             while (!q.empty()) {
@@ -102,7 +98,6 @@ namespace sjtu {
             priority_queue<Ticket, SortByCost> q;
             for (auto x : ret) {
                 Train nw = idToTrain.find(x);
-                
                 if (nw.is_released == false) continue;
                 int st_pos = -1, ed_pos = -1;
                 for (int i = 0; i < nw.stationNum; i++) {
@@ -123,26 +118,21 @@ namespace sjtu {
                     if (i > 0) nw_time += nw.stopoverTime[i];
                     if (i == st_pos) tic.startTime = nw_time;
                     nw_time += nw.travelTimes[i];
-                    //std::cout << nw.travelTimes[i];
                     if (i >= st_pos && i < ed_pos) {
-                        //tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                         tic.ticketCost += nw.prices[i];
                     }
                 }
-                //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
                 int delta = tic.endTime - tic.startTime;
-                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
-                    int tmp = tic.startTime;
-                    tic.startTime = tic.startTime % kMinPerDay + Date;
-                    tic.endTime = tic.startTime + delta;
-                    int start_date = tic.startTime - tmp;
-                    RemainSeat seat;
-                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                    for (int i = st_pos; i < ed_pos; i++) {
-                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                    }
-                    q.push(tic);
+                int tmp = tic.startTime;
+                tic.startTime = tic.startTime % kMinPerDay + Date;
+                tic.endTime = tic.startTime + delta;
+                int start_date = tic.startTime - tmp;
+                RemainSeat seat;
+                remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
+                for (int i = st_pos; i < ed_pos; i++) {
+                    tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                 }
+                q.push(tic);
             }
             std::cout << q.size() << '\n';
             while (!q.empty()) {
