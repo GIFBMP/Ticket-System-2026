@@ -63,7 +63,8 @@ int main() {
         }
         else if (v[1] == "add_user") {
             //std::cout << "****" << len << '\n';
-            Usrname usrname, cur, name;
+            Usrname usrname, cur; 
+            Name name;
             Mail mailaddr;
             Pwd pwd;
             int privilege = -1;
@@ -100,7 +101,8 @@ int main() {
         }
         else if (v[1] == "modify_profile") {
             Pwd pwd = Pwd("");
-            Usrname cur, usrname, name = Usrname("");
+            Usrname cur, usrname;
+            Name name = Name("");
             Mail mailaddr = Mail("");
             int privilege = -1;
             for (int i = 2; i < len; i += 2) {

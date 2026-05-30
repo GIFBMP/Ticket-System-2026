@@ -52,6 +52,7 @@ namespace sjtu {
     using Index30 = Index<30>;
     using Index40 = Index<40>;
     using Usrname = Index20;
+    using Name = Index<15>;
     using Pwd = Index30;
     using Mail = Index30;
     using TrainID = Index20;

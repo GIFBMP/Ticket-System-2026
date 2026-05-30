@@ -5,7 +5,7 @@
 namespace sjtu {
     bpt<Usrname, User> nameToUser("Name_to_User_File");
     map<Usrname, bool> isLogin;
-    int add_user(const Usrname &cur, const Usrname &usrname, const Pwd &pwd, const Usrname &name, const Mail &mailaddr, int privilege) {
+    int add_user(const Usrname &cur, const Usrname &usrname, const Pwd &pwd, const Name &name, const Mail &mailaddr, int privilege) {
         if (nameToUser.firstadd()) {//first add: ignore cur and privilege
             //std::cout << "firstadd";
             User nw;
@@ -67,7 +67,7 @@ namespace sjtu {
         std::cout << nw.username << ' ' << nw.name << ' ' << nw.mailaddr << ' ' << nw.privilege << '\n';
         return 0;
     }
-    int modify_profile(const Usrname &cur, const Usrname &usrname, const Pwd &pwd, const Usrname &name, const Mail &mailaddr, int privilege = -1) {
+    int modify_profile(const Usrname &cur, const Usrname &usrname, const Pwd &pwd, const Name &name, const Mail &mailaddr, int privilege = -1) {
         if (!isLogin.count(cur)) {
             //std::cerr << "not login\n";
             return -1;

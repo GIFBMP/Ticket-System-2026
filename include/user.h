@@ -8,14 +8,14 @@ namespace sjtu {
     struct User {
         Usrname username;
         Pwd password;
-        Usrname name;
+        Name name;
         Mail mailaddr;
         int privilege;
         User() {
-            username = Index20("");
-            password = Index30("");
-            name = Index20("");
-            mailaddr = Index30("");
+            username = Usrname("");
+            password = Pwd("");
+            name = Name("");
+            mailaddr = Mail("");
             privilege = 0;
         }
         bool operator < (const User &x) const {
@@ -30,11 +30,11 @@ namespace sjtu {
     };
     extern bpt<Usrname, User> nameToUser;
     extern map<Usrname, bool> isLogin;
-    int add_user(const Usrname&, const Usrname&, const Pwd&, const Usrname&, const Mail&, int);
+    int add_user(const Usrname&, const Usrname&, const Pwd&, const Name&, const Mail&, int);
     int login(const Usrname&, const Pwd&);
     int logout(const Usrname&);
     int query_profile(const Usrname&, const Usrname&);
-    int modify_profile(const Usrname&, const Usrname&, const Pwd&, const Usrname&, const Mail&, int);
+    int modify_profile(const Usrname&, const Usrname&, const Pwd&, const Name&, const Mail&, int);
 }
 
 #endif
