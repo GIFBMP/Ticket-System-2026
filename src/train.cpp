@@ -5,7 +5,6 @@ namespace sjtu {
     bpt<Station, TrainID> stationToID("Station_to_ID_File");
     bpt<TrainKey, int> dailySeat("Daily_Seat_File");
     MemoryRiver<RemainSeat, 0> remainSeats("Remain_Seats_File");
-    bpt<StartEndKey, StartEndVal> ticQry("Tic_Qry_File");
     int addtrain(const TrainID &trainID, int stationNum, int seatNum, const string& stations, const string& prices, \
                  const string& startTime, const string& travelTimes, const string& stopoverTimes, const string& saleDate, const string& typ) {
         Train nw = idToTrain.find(trainID);
@@ -72,32 +71,6 @@ namespace sjtu {
         idToTrain.insert(id, nw);
         for (int i = 0; i < nw.stationNum; i++) {
             stationToID.insert(nw.stations[i], id);
-        }
-        int nw_time = nw.startTime, arr[kMaxStation] = {0}, lev[kMaxStation] = {0};
-        for (int i = 0; i < nw.stationNum; i++) {
-            arr[i] = nw_time;
-            if (i > 0 && i < nw.stationNum - 1) nw_time += nw.stopoverTime[i];
-            lev[i] = nw_time;
-            nw_time += nw.travelTimes[i];
-        }
-        for (int ti = nw.saleStart; ti <= nw.saleEnd; ti += kMinPerDay) {
-            for (int i = 0; i < nw.stationNum; i++) {
-                int pri = nw.prices[i];
-                for (int j = i + 1; j < nw.stationNum; j++) {
-                    StartEndKey key; StartEndVal val;
-                    key.date = getDate(lev[i] + ti);
-                    key.st = nw.stations[i];
-                    key.ed = nw.stations[j];
-                    val.st_pos = i; val.ed_pos = j;
-                    val.st_time = lev[i] + ti;
-                    val.ed_time = arr[j] + ti;
-                    val.departdate = ti;
-                    val.id = id;
-                    val.price = pri;
-                    ticQry.insert(key, val);
-                    pri += nw.prices[j];
-                }
-            }
         }
         return 0;
     }

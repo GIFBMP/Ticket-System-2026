@@ -1,5 +1,6 @@
 testcases/
 build/
+pretask/
 User_to_Ticket_File
 Tickets_File
 Train_to_Pending_Ticket_File
