@@ -2,6 +2,7 @@
 #ifndef BASECLASS_H
 #define BASECLASS_H
 #include <string>
+#include <cstring>
 namespace sjtu {
     using std::string;
     template<int len>
@@ -20,31 +21,22 @@ namespace sjtu {
             return s[0] == '\0';
         }
         bool operator < (const Index &t) const {
-            for (int i = 0; i < len; i++)
-                if (s[i] < t.s[i]) return true;
-                else if (s[i] > t.s[i]) return false;
-            return false;
+            return strcmp(s, t.s) < 0;
         }
         bool operator <= (const Index &t) const {
-            for (int i = 0; i < len; i++)
-                if (s[i] < t.s[i]) return true;
-                else if (s[i] > t.s[i]) return false;
-            return true;
+            return strcmp(s, t.s) <= 0;
         }
         bool operator == (const Index &t) const {
-            for (int i = 0; i < len; i++)
-                if (s[i] != t.s[i]) return false;
-            return true;
+            return strcmp(s, t.s) == 0;
         }
         bool operator != (const Index &t) const {
-            for (int i = 0; i < len; i++)
-                if (s[i] != t.s[i]) return true;
-            return false;
+            return strcmp(s, t.s) != 0;
         }
         string tostring() const {
             string ret = "";
             for (int i = 0; i < len; i++)
                 if (s[i] != '\0') ret += s[i];
+                else break;
             return ret;
         }
     };
