@@ -35,7 +35,8 @@ namespace sjtu {
     }
     void query_ticket(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
         int Date = proceedDate(date);
-        vector<TrainID> t1 = startToTrain.multifind(StartKey{st, Date}), t2 = stationToID.multifind(ed), ret;
+        vector<TrainID> t1 = stationToID.multifind(st), 
+                        t2 = stationToID.multifind(ed), ret;
         int l1 = t1.size(), l2 = t2.size();
         for (int i = 0, j = 0; i < l1; i++) {
             for (; j < l2 && t2[j] < t1[i]; j++);
@@ -77,16 +78,18 @@ namespace sjtu {
                 }
                 //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
                 int delta = tic.endTime - tic.startTime;
-                int tmp = tic.startTime;
-                tic.startTime = tic.startTime % kMinPerDay + Date;
-                tic.endTime = tic.startTime + delta;
-                int start_date = tic.startTime - tmp;
-                RemainSeat seat;
-                remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                for (int i = st_pos; i < ed_pos; i++) {
-                    tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
+                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
+                    int tmp = tic.startTime;
+                    tic.startTime = tic.startTime % kMinPerDay + Date;
+                    tic.endTime = tic.startTime + delta;
+                    int start_date = tic.startTime - tmp;
+                    RemainSeat seat;
+                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
+                    for (int i = st_pos; i < ed_pos; i++) {
+                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
+                    }
+                    q.push(tic);
                 }
-                q.push(tic);
             }
             std::cout << q.size() << '\n';
             while (!q.empty()) {
@@ -118,21 +121,26 @@ namespace sjtu {
                     if (i > 0) nw_time += nw.stopoverTime[i];
                     if (i == st_pos) tic.startTime = nw_time;
                     nw_time += nw.travelTimes[i];
+                    //std::cout << nw.travelTimes[i];
                     if (i >= st_pos && i < ed_pos) {
+                        //tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                         tic.ticketCost += nw.prices[i];
                     }
                 }
+                //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
                 int delta = tic.endTime - tic.startTime;
-                int tmp = tic.startTime;
-                tic.startTime = tic.startTime % kMinPerDay + Date;
-                tic.endTime = tic.startTime + delta;
-                int start_date = tic.startTime - tmp;
-                RemainSeat seat;
-                remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                for (int i = st_pos; i < ed_pos; i++) {
-                    tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
+                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
+                    int tmp = tic.startTime;
+                    tic.startTime = tic.startTime % kMinPerDay + Date;
+                    tic.endTime = tic.startTime + delta;
+                    int start_date = tic.startTime - tmp;
+                    RemainSeat seat;
+                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
+                    for (int i = st_pos; i < ed_pos; i++) {
+                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
+                    }
+                    q.push(tic);
                 }
-                q.push(tic);
             }
             std::cout << q.size() << '\n';
             while (!q.empty()) {

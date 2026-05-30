@@ -59,20 +59,20 @@ namespace sjtu {
         }
 
     };
-    struct StartKey {
-        Station st;
-        int date;
-        StartKey() = default;
-        bool operator < (const StartKey &x) const {
-            return date == x.date ? st < x.st : date < x.date;
-        }
-        bool operator <= (const StartKey &x) const {
-            return date == x.date ? st <= x.st : date < x.date;
-        }
-        bool operator == (const StartKey &x) const {
-            return date == x.date && st == x.st;
-        }
-    };
+    // struct StartKey {
+    //     Station st;
+    //     int date;
+    //     StartKey() = default;
+    //     bool operator < (const StartKey &x) const {
+    //         return date == x.date ? st < x.st : date < x.date;
+    //     }
+    //     bool operator <= (const StartKey &x) const {
+    //         return date == x.date ? st <= x.st : date < x.date;
+    //     }
+    //     bool operator == (const StartKey &x) const {
+    //         return date == x.date && st == x.st;
+    //     }
+    // };
     int addtrain(const TrainID&, int, int, const string&, const string&, const string&, const string&, \
                  const string&, const string&, const string&);
     int deltrain(const TrainID&);
@@ -82,6 +82,6 @@ namespace sjtu {
     extern bpt<Station, TrainID> stationToID;
     extern bpt<TrainKey, int> dailySeat;
     extern MemoryRiver<RemainSeat, 0> remainSeats;
-    extern bpt<StartKey, TrainID> startToTrain;
+    //extern bpt<StartKey, TrainID> startToTrain;
 }
 #endif
