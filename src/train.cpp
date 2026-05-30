@@ -29,6 +29,7 @@ namespace sjtu {
         }
         
         //std::cout << "(((())))\n";
+        nw.seatNum = seatNum;
         nw.typ = typ[0];
         nw.startTime = proceedTime(startTime);
         nw.saleStart = proceedDate(saleDate.substr(0, 5));

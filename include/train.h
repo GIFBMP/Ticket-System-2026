@@ -7,7 +7,7 @@ namespace sjtu {
     const int kMaxStation = 26;
     struct Train {
         TrainID trainID;
-        int stationNum;
+        int stationNum, seatNum;
         Station stations[kMaxStation];
         int prices[kMaxStation];
         int startTime;
@@ -17,7 +17,7 @@ namespace sjtu {
         char typ;
         Train() {
             trainID = Index20("");
-            stationNum = 0;
+            stationNum = seatNum = 0;
             for (int i = 0; i < kMaxStation; i++) {
                 stations[i] = Index30("");
                 travelTimes[i] = stopoverTime[i] = 0;

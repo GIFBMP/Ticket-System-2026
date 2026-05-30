@@ -286,7 +286,7 @@ namespace sjtu {
                    const Station &st, const Station &ed, bool typ = false) {
         if (!isLogin.count(usr)) return -1;//does not login
         Train nw_train = idToTrain.find(id);
-        if (nw_train.trainID.empty() || nw_train.is_released == false) {
+        if (nw_train.trainID.empty() || nw_train.is_released == false || cnt > nw_train.seatNum) {
             return -1;// train does not exist/has not been released
         }
         //std::cout << "**()";
