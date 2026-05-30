@@ -3,6 +3,7 @@
 #define TRAIN_H
 #include "baseclass.h"
 #include "bpt.h"
+#include <cstring>
 namespace sjtu {
     const int kMaxStation = 24;
     struct Train {
@@ -15,17 +16,17 @@ namespace sjtu {
         bool is_released;
         int saleStart, saleEnd;
         char typ;
-        Train() {
-            trainID = Index20("");
-            stationNum = seatNum = 0;
-            for (int i = 0; i < kMaxStation; i++) {
-                stations[i] = Index30("");
-                travelTimes[i] = stopoverTime[i] = 0;
-            }
-            startTime = 0;
-            is_released = false;
-            typ = '\0';
-        }
+        Train() = default;
+        //     trainID = Index20("");
+        //     stationNum = seatNum = 0;
+        //     for (int i = 0; i < kMaxStation; i++) {
+        //         stations[i] = Index30("");
+        //         travelTimes[i] = stopoverTime[i] = 0;
+        //     }
+        //     startTime = 0;
+        //     is_released = false;
+        //     typ = '\0';
+        // }
         bool operator < (const Train &x) const {
             return trainID < x.trainID;
         }
@@ -53,9 +54,7 @@ namespace sjtu {
     struct RemainSeat {
         int seatNum[kMaxStation];
         RemainSeat () {
-            for (int i = 0; i < kMaxStation; i++) {
-                seatNum[i] = 0;
-            }
+            memset(seatNum, 0, sizeof(seatNum));
         }
 
     };
