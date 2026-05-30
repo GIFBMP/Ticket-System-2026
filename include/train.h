@@ -4,7 +4,7 @@
 #include "baseclass.h"
 #include "bpt.h"
 namespace sjtu {
-    const int kMaxStation = 26;
+    const int kMaxStation = 24;
     struct Train {
         TrainID trainID;
         int stationNum, seatNum;
