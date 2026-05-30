@@ -34,7 +34,8 @@ namespace sjtu {
         return out;
     }
     void query_ticket(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
-        vector<TrainID> t1 = stationToID.multifind(st), t2 = stationToID.multifind(ed), ret;
+        int Date = proceedDate(date);
+        vector<TrainID> t1 = startToTrain.multifind(StartKey{st, Date}), t2 = stationToID.multifind(ed), ret;
         int l1 = t1.size(), l2 = t2.size();
         for (int i = 0, j = 0; i < l1; i++) {
             for (; j < l2 && t2[j] < t1[i]; j++);
@@ -44,7 +45,6 @@ namespace sjtu {
         Ticket tic;
         tic.startStation = st;
         tic.endStation = ed;
-        int Date = proceedDate(date);
         //std::cout << typ << '\n';
         if (typ == 0) {//time
             priority_queue<Ticket, SortByTime> q;

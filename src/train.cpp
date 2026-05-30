@@ -5,6 +5,7 @@ namespace sjtu {
     bpt<Station, TrainID> stationToID("Station_to_ID_File");
     bpt<TrainKey, int> dailySeat("Daily_Seat_File");
     MemoryRiver<RemainSeat, 0> remainSeats("Remain_Seats_File");
+    bpt<StartKey, TrainID> startToTrain("Start_to_Train_File");
     int addtrain(const TrainID &trainID, int stationNum, int seatNum, const string& stations, const string& prices, \
                  const string& startTime, const string& travelTimes, const string& stopoverTimes, const string& saleDate, const string& typ) {
         Train nw = idToTrain.find(trainID);
@@ -71,6 +72,21 @@ namespace sjtu {
         idToTrain.insert(id, nw);
         for (int i = 0; i < nw.stationNum; i++) {
             stationToID.insert(nw.stations[i], id);
+        }
+        int nw_time = nw.startTime, lev[kMaxStation] = {0};
+        for (int i = 0; i < nw.stationNum; i++) {
+            if (i > 0 && i < nw.stationNum - 1) nw_time += nw.stopoverTime[i];
+            lev[i] = nw_time;
+            nw_time += nw.travelTimes[i];
+        }
+        for (int ti = nw.saleStart; ti <= nw.saleEnd; ti += kMinPerDay) {
+            for (int i = 0; i < nw.stationNum; i++) {
+                int pri = nw.prices[i];
+                StartKey key;
+                key.date = getDate(lev[i] + ti);
+                key.st = nw.stations[i];
+                startToTrain.insert(key, id);
+            }
         }
         return 0;
     }
