@@ -30,11 +30,11 @@ namespace sjtu {
     };
     extern bpt<Usrname, User> nameToUser;
     extern map<Usrname, bool> isLogin;
-    int add_user(Usrname, Usrname, Pwd, Usrname, Mail, int);
-    int login(Usrname, Pwd);
-    int logout(Usrname);
-    int query_profile(Usrname, Usrname);
-    int modify_profile(Usrname, Usrname, Pwd, Usrname, Mail, int);
+    int add_user(const Usrname&, const Usrname&, const Pwd&, const Usrname&, const Mail&, int);
+    int login(const Usrname&, const Pwd&);
+    int logout(const Usrname&);
+    int query_profile(const Usrname&, const Usrname&);
+    int modify_profile(const Usrname&, const Usrname&, const Pwd&, const Usrname&, const Mail&, int);
 }
 
 #endif

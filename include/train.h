@@ -59,11 +59,11 @@ namespace sjtu {
         }
 
     };
-    int addtrain(TrainID, int, int, const string&, const string&, const string&, const string&, \
+    int addtrain(const TrainID&, int, int, const string&, const string&, const string&, const string&, \
                  const string&, const string&, const string&);
-    int deltrain(TrainID);
-    int releasetrain(TrainID);
-    int querytrain(const string&, TrainID);
+    int deltrain(const TrainID&);
+    int releasetrain(const TrainID&);
+    int querytrain(const string&, const TrainID&);
     extern bpt<TrainID, Train> idToTrain;
     extern bpt<Station, TrainID> stationToID;
     extern bpt<TrainKey, int> dailySeat;

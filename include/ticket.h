@@ -44,12 +44,13 @@ namespace sjtu {
             return y.trainID < x.trainID;
         }
     };
+    
     std::ostream& operator << (std::ostream &, const Ticket &);
-    void query_ticket(Station, Station, const string &, int);//0:time 1:cost
-    int query_transfer(Station, Station, const string &, int);
-    int buy_ticket(Usrname, TrainID, const string&, int, Station, Station, bool);
-    int query_order(Usrname);
-    int refund_ticket(Usrname, int);
+    void query_ticket(const Station&, const Station&, const string &, int);//0:time 1:cost
+    int query_transfer(const Station&, const Station&, const string &, int);
+    int buy_ticket(const Usrname&, const TrainID&, const string&, int, const Station&, const Station&, bool);
+    int query_order(const Usrname&);
+    int refund_ticket(const Usrname&, int);
     extern bpt<Usrname, int> userToTicket;
     extern bpt<TrainKey, int> trainToPendingTicket;
     extern MemoryRiver<Ticket, 0> tickets;

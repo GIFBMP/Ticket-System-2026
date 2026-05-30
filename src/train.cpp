@@ -1,11 +1,12 @@
 #include "../include/train.h"
 #include "../include/lexer.h"
+#include "../include/ticket.h"
 namespace sjtu {
     bpt<TrainID, Train> idToTrain("ID_to_Train_File");
     bpt<Station, TrainID> stationToID("Station_to_ID_File");
     bpt<TrainKey, int> dailySeat("Daily_Seat_File");
     MemoryRiver<RemainSeat, 0> remainSeats("Remain_Seats_File");
-    int addtrain(TrainID trainID, int stationNum, int seatNum, const string& stations, const string& prices, \
+    int addtrain(const TrainID &trainID, int stationNum, int seatNum, const string& stations, const string& prices, \
                  const string& startTime, const string& travelTimes, const string& stopoverTimes, const string& saleDate, const string& typ) {
         Train nw = idToTrain.find(trainID);
         if (!nw.trainID.empty()) return -1;
@@ -46,7 +47,7 @@ namespace sjtu {
         }
         return 0;
     }
-    int deltrain(TrainID id) {
+    int deltrain(const TrainID &id) {
         Train nw = idToTrain.find(id);
         if (nw.trainID.empty()) {//does not exist
             return -1; 
@@ -64,7 +65,7 @@ namespace sjtu {
         }
         return 0;
     }
-    int releasetrain(TrainID id) {
+    int releasetrain(const TrainID &id) {
         Train nw = idToTrain.find(id);
         if (nw.trainID.empty()) {//does not exist
             return -1; 
@@ -77,7 +78,7 @@ namespace sjtu {
         idToTrain.insert(id, nw);
         return 0;
     }
-    int querytrain(const string &date, TrainID id) {
+    int querytrain(const string &date, const TrainID &id) {
         Train nw = idToTrain.find(id);
         if (nw.trainID.empty()) return -1;
         int Date = proceedDate(date);

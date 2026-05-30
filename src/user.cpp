@@ -5,7 +5,7 @@
 namespace sjtu {
     bpt<Usrname, User> nameToUser("Name_to_User_File");
     map<Usrname, bool> isLogin;
-    int add_user(Usrname cur, Usrname usrname, Pwd pwd, Usrname name, Mail mailaddr, int privilege) {
+    int add_user(const Usrname &cur, const Usrname &usrname, const Pwd &pwd, const Usrname &name, const Mail &mailaddr, int privilege) {
         if (nameToUser.firstadd()) {//first add: ignore cur and privilege
             //std::cout << "firstadd";
             User nw;
@@ -36,21 +36,21 @@ namespace sjtu {
         nameToUser.insert(usrname, nw);
         return 0;
     }
-    int login(Usrname username, Pwd pwd) {
+    int login(const Usrname &username, const Pwd &pwd) {
         if (isLogin.count(username)) return -1;//case 1: user has logined
         User nw = nameToUser.find(username);
         if (nw.username.empty() || pwd != nw.password) return -1;//case 2, 3: user doesn't exist/wrong password
         isLogin[username] = true;
         return 0;
     }
-    int logout(Usrname username) {
+    int logout(const Usrname &username) {
         if (!isLogin.count(username)) return -1;//case 1: user hasn't logined
         // User nw = nameToUser.find(username);
         // if (nw.username.empty()) return -1;//case 2: user doesn't exist
         isLogin.erase(isLogin.find(username));
         return 0;
     }
-    int query_profile(Usrname cur, Usrname x) {
+    int query_profile(const Usrname &cur, const Usrname &x) {
         if (!isLogin.count(cur)) {
             return -1;
         }
@@ -67,7 +67,7 @@ namespace sjtu {
         std::cout << nw.username << ' ' << nw.name << ' ' << nw.mailaddr << ' ' << nw.privilege << '\n';
         return 0;
     }
-    int modify_profile(Usrname cur, Usrname usrname, Pwd pwd, Usrname name, Mail mailaddr, int privilege = -1) {
+    int modify_profile(const Usrname &cur, const Usrname &usrname, const Pwd &pwd, const Usrname &name, const Mail &mailaddr, int privilege = -1) {
         if (!isLogin.count(cur)) {
             //std::cerr << "not login\n";
             return -1;

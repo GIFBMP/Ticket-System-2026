@@ -33,8 +33,8 @@ namespace sjtu {
         out << ' ' << x.ticketCost << ' ' << x.ticketNum;
         return out;
     }
-    void query_ticket(Station st, Station ed, const string &date, int typ = 0) {//typ 0:time 1:cost
-        vector<TrainID> t1 = stationToID.multifind(st), t2 = stationToID.multifind(st), ret;
+    void query_ticket(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
+        vector<TrainID> t1 = stationToID.multifind(st), t2 = stationToID.multifind(ed), ret;
         int l1 = t1.size(), l2 = t2.size();
         for (int i = 0, j = 0; i < l1; i++) {
             for (; j < l2 && t2[j] < t1[i]; j++);
@@ -150,11 +150,12 @@ namespace sjtu {
             }
         }
     }
-    int query_transfer(Station st, Station ed, const string &date, int typ = 0) {//typ 0:time 1:cost
+    int query_transfer(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
         //Todo:: reconstruct!
         vector<TrainID> ret = stationToID.multifind(st);
         Ticket ans1, ans2, tmp1, tmp2;
         int total = kInf, total2 = kInf, Date = proceedDate(date);
+        map<Station, vector<Ticket> > p;
         for (auto x : ret) {
             Train nw = idToTrain.find(x);
             int st_pos = -1;
@@ -173,7 +174,6 @@ namespace sjtu {
             }
             tmp1.startStation = st;
             tmp1.trainID = x;
-            
             tmp1.ticketCost = nw.prices[st_pos];
             int start_ = tmp1.startTime;
             if (!(getDate(nw.saleStart + tmp1.startTime) <= Date && Date <= getDate(nw.saleEnd + tmp1.startTime))) continue;
@@ -185,74 +185,10 @@ namespace sjtu {
             tmp1.ticketNum = seat.seatNum[st_pos];
             for (int i = st_pos + 1; i < nw.stationNum; i++) {
                 tmp1.endTime = tmp1.startTime + nw_time - start_;
-                vector<TrainID> trans = stationToID.multifind(nw.stations[i]);
-                tmp2.startStation = tmp1.endStation = nw.stations[i];
+                tmp1.endStation = nw.stations[i];
+                tmp1.date = start_date;
                 if (nw.stations[i] != ed) {
-                    Station tr_station = nw.stations[i];
-                    for (auto y : trans) {
-                        if (y == x) continue;
-                        Train tr_train = idToTrain.find(y);
-                        tmp2.trainID = y;
-                        tmp2.ticketNum = kInf;
-                        tmp2.ticketCost = 0;
-                        int tr_pos = -1, ed_pos = -1;
-                        for (int j = 0; j < tr_train.stationNum; j++) {
-                            if (tr_train.stations[j] == tr_station) tr_pos = j;
-                            if (tr_train.stations[j] == ed) ed_pos = j;
-                        }
-                        if (ed_pos == -1 || ed_pos <= tr_pos) continue; 
-                        int tr_time = tr_train.startTime;
-                        for (int j = 0; j < tr_train.stationNum; j++) {
-                            if (j == ed_pos) {
-                                tmp2.endTime = tr_time;
-                                break;
-                            }
-                            if (j > 0) tr_time += tr_train.stopoverTime[j];
-                            if (j == tr_pos) tmp2.startTime = tr_time;
-                            tr_time += tr_train.travelTimes[j];
-                            if (j >= tr_pos && j < ed_pos) {
-                                //tmp2.ticketNum = min(tmp2.ticketNum, nw.seatNum[j]);
-                                tmp2.ticketCost += tr_train.prices[j];
-                            }
-                        }
-                        if (tmp1.endTime <= tmp2.startTime + tr_train.saleEnd) {
-                            int extra_min = ((tmp1.endTime - tmp2.startTime + kMinPerDay - 1) / kMinPerDay) * kMinPerDay;
-                            //int tmp_train2 = tmp2.startTime;
-                            tmp2.startTime += max(tr_train.saleStart, extra_min);
-                            tmp2.endTime += max(tr_train.saleStart, extra_min);
-                            tmp2.endStation = ed;
-                            int start_date2 = max(tr_train.saleStart, extra_min);
-                            RemainSeat seat2;
-                            remainSeats.read(seat2, dailySeat.find(TrainKey(y, start_date2)));
-                            for (int j = tr_pos; j < ed_pos; j++) {
-                                tmp2.ticketNum = min(tmp2.ticketNum, seat2.seatNum[j]);
-                            }
-                            int total_time = tmp2.endTime - tmp1.startTime;
-                            int total_cost = tmp2.ticketCost + tmp1.ticketCost;
-                            if (typ == 0) {//time
-                                if (total_time < total || (total_time == total && total_cost < total2) ||\
-                                    (total_time == total && total_cost == total2 && tmp1.trainID < ans1.trainID) ||\
-                                    (total_time == total && total_cost == total2 && \
-                                     tmp1.trainID == ans1.trainID && tmp2.trainID < ans2.trainID)) {
-                                        total = total_time;
-                                        total2 = total_cost;
-                                        ans1 = tmp1;
-                                        ans2 = tmp2;
-                                     }
-                            }
-                            else {//cost
-                                if (total_cost < total || (total_cost == total && total_time < total2) ||\
-                                    (total_cost == total && total_time == total2 && tmp1.trainID < ans1.trainID) ||\
-                                    (total_cost == total && total_time == total2 && \
-                                     tmp1.trainID == ans1.trainID && tmp2.trainID < ans2.trainID)) {
-                                        total = total_cost;
-                                        total2 = total_time;
-                                        ans1 = tmp1;
-                                        ans2 = tmp2;
-                                     }
-                            }
-                        }
-                    }
+                    p[nw.stations[i]].push_back(tmp1);
                 }
                 tmp1.ticketNum = min(tmp1.ticketNum, seat.seatNum[i]);
                 tmp1.ticketCost += nw.prices[i];
@@ -261,12 +197,82 @@ namespace sjtu {
                 }
             }
         }
+        ret = stationToID.multifind(ed);
+        for (auto x : ret) {
+            Train nw = idToTrain.find(x);
+            int ed_pos = -1;
+            for (int i = 0; i < nw.stationNum; i++) {
+                if (nw.stations[i] == ed) {
+                    ed_pos = i;
+                    break;
+                }
+            }
+            if (ed_pos == 0) continue;
+            int nw_time = nw.startTime, ti[kMaxStation] = {0};
+            for (int i = 0; i <= ed_pos; i++) {
+                if (i == ed_pos) ti[i] = nw_time; //arrival time
+                if (i > 0) nw_time += nw.stopoverTime[i];
+                if (i < ed_pos) ti[i] = nw_time;//leave time
+                nw_time += nw.travelTimes[i];
+            }
+            tmp2.ticketCost = 0;
+            tmp2.ticketNum = kInf;
+            tmp2.trainID = x;
+            tmp2.endStation = ed;
+            tmp2.endTime = ti[ed_pos];
+            for (int i = ed_pos - 1; ~i; i--) {
+                tmp2.startStation = nw.stations[i];
+                tmp2.startTime = ti[i];
+                tmp2.ticketCost += nw.prices[i];
+                if (!p.count(nw.stations[i])) continue;
+                for (auto tic : p[nw.stations[i]]) {
+                    tmp1 = tic; int start_date1 = tmp1.date;
+                    if (tmp1.endTime <= tmp2.startTime + nw.saleEnd) {
+                        int extra_min = ((tmp1.endTime - tmp2.startTime + kMinPerDay - 1) / kMinPerDay) * kMinPerDay;
+                        //int tmp_train2 = tmp2.startTime;
+                        tmp2.startTime += max(nw.saleStart, extra_min);
+                        tmp2.endTime += max(nw.saleStart, extra_min);
+                        tmp2.endStation = ed;
+                        int start_date2 = max(nw.saleStart, extra_min);
+                        RemainSeat seat2;
+                        remainSeats.read(seat2, dailySeat.find(TrainKey(x, start_date2)));
+                        for (int j = i; j < ed_pos; j++) {
+                            tmp2.ticketNum = min(tmp2.ticketNum, seat2.seatNum[j]);
+                        }
+                        int total_time = tmp2.endTime - tmp1.startTime;
+                        int total_cost = tmp2.ticketCost + tmp1.ticketCost;
+                        if (typ == 0) {//time
+                            if (total_time < total || (total_time == total && total_cost < total2) ||\
+                               (total_time == total && total_cost == total2 && tmp1.trainID < ans1.trainID) ||\
+                               (total_time == total && total_cost == total2 && \
+                                tmp1.trainID == ans1.trainID && tmp2.trainID < ans2.trainID)) {
+                                    total = total_time;
+                                    total2 = total_cost;
+                                    ans1 = tmp1;
+                                    ans2 = tmp2;
+                                }
+                        }
+                        else {//cost
+                            if (total_cost < total || (total_cost == total && total_time < total2) ||\
+                               (total_cost == total && total_time == total2 && tmp1.trainID < ans1.trainID) ||\
+                               (total_cost == total && total_time == total2 && \
+                                tmp1.trainID == ans1.trainID && tmp2.trainID < ans2.trainID)) {
+                                    total = total_cost;
+                                    total2 = total_time;
+                                    ans1 = tmp1;
+                                    ans2 = tmp2;
+                                }
+                        }
+                    }
+                }
+            }
+        }
         if (total == kInf) std::cout << "0\n";
         else std::cout << ans1 << '\n' << ans2 << '\n';
         return 0;
     }
-    int buy_ticket(Usrname usr, TrainID id, const string &date, int cnt,
-                   Station st, Station ed, bool typ = false) {
+    int buy_ticket(const Usrname &usr, const TrainID &id, const string &date, int cnt,
+                   const Station &st, const Station &ed, bool typ = false) {
         if (!isLogin.count(usr)) return -1;//does not login
         Train nw_train = idToTrain.find(id);
         if (nw_train.trainID.empty() || nw_train.is_released == false) {
@@ -323,7 +329,7 @@ namespace sjtu {
             if (typ == false || tic.ticketNum >= cnt) {
                 tic.ticketNum = cnt;
                 tic.status = TicketStatus::SUCCESS;
-                int tic_pos = ticketToTrain.push(id);
+                int tic_pos = ticketToTrain.push(const_cast<TrainID&>(id));
                 tic.timeStamp = tic_pos;
                 tickets.push(tic);
                 userToTicket.insert(usr, tic_pos);
@@ -336,7 +342,7 @@ namespace sjtu {
             else if (typ == true) {
                 tic.ticketNum = cnt;
                 tic.status = TicketStatus::PENDING;
-                int tic_pos = ticketToTrain.push(id);
+                int tic_pos = ticketToTrain.push(const_cast<TrainID&>(id));
                 tic.timeStamp = tic_pos;
                 tickets.push(tic);
                 userToTicket.insert(usr, tic_pos);
@@ -347,7 +353,7 @@ namespace sjtu {
         }
         return -1;
     }
-    int query_order(Usrname usr) {
+    int query_order(const Usrname &usr) {
         if (!isLogin.count(usr)) return -1;
         vector<int> orders = userToTicket.multifind(usr);
         int len = orders.size();
@@ -362,7 +368,7 @@ namespace sjtu {
         }
         return 0;
     }
-    int refund_ticket(Usrname usr, int ord = 1) {
+    int refund_ticket(const Usrname &usr, int ord = 1) {
         if (!isLogin.count(usr)) return -1;
         vector<int> orders = userToTicket.multifind(usr);
         int len = orders.size();
