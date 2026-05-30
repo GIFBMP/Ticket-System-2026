@@ -80,7 +80,7 @@ namespace sjtu {
             nw_time += nw.travelTimes[i];
         }
         for (int ti = nw.saleStart; ti <= nw.saleEnd; ti += kMinPerDay) {
-            for (int i = 0; i < nw.stationNum; i++) {
+            for (int i = 0; i < nw.stationNum - 1; i++) {
                 int pri = nw.prices[i];
                 StartKey key;
                 key.date = getDate(lev[i] + ti);
