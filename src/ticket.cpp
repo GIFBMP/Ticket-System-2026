@@ -38,6 +38,7 @@ namespace sjtu {
         int l1 = t1.size(), l2 = t2.size();
         for (int i = 0, j = 0; i < l1; i++) {
             for (; j < l2 && t2[j] < t1[i]; j++);
+            if (j == l2) break;
             if (t2[j] == t1[i]) ret.push_back(t1[i]);
         }
         Ticket tic;

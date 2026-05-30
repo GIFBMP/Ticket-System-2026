@@ -1,6 +1,5 @@
 #include "../include/train.h"
 #include "../include/lexer.h"
-#include "../include/ticket.h"
 namespace sjtu {
     bpt<TrainID, Train> idToTrain("ID_to_Train_File");
     bpt<Station, TrainID> stationToID("Station_to_ID_File");
