@@ -59,6 +59,35 @@ namespace sjtu {
         }
 
     };
+     struct StartEndKey {
+         Station st, ed;
+         int date;
+         StartEndKey() = default;
+         bool operator < (const StartEndKey &x) const {
+             return date == x.date ? st == x.st ? ed < x.ed : st < x.st : date < x.date;
+         }
+         bool operator <= (const StartEndKey &x) const {
+             return date == x.date ? st == x.st ? ed <= x.ed : st < x.st : date < x.date;
+         }
+         bool operator == (const StartEndKey &x) const {
+             return date == x.date && st == x.st && ed == x.ed;
+         }
+     };
+     struct StartEndVal {
+         int st_pos, ed_pos, price;
+         int st_time, ed_time;
+         TrainID id;
+         StartEndVal() = default;
+         bool operator < (const StartEndVal &x) const {
+             return id == x.id ? st_time == x.st_time ? ed_time < x.ed_time : st_time < x.st_time : id < x.id;
+         }
+         bool operator <= (const StartEndVal &x) const {
+             return id == x.id ? st_time == x.st_time ? ed_time <= x.ed_time : st_time < x.st_time : id < x.id;
+         }
+         bool operator == (const StartEndVal &x) const {
+             return id == x.id && st_time == x.st_time && ed_time == x.ed_time;
+         }
+     };
     int addtrain(const TrainID&, int, int, const string&, const string&, const string&, const string&, \
                  const string&, const string&, const string&);
     int deltrain(const TrainID&);
@@ -68,5 +97,6 @@ namespace sjtu {
     extern bpt<Station, TrainID> stationToID;
     extern bpt<TrainKey, int> dailySeat;
     extern MemoryRiver<RemainSeat, 0> remainSeats; 
+    extern bpt<StartEndKey, StartEndVal> ticQry;
 }
 #endif

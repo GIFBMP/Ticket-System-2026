@@ -5,6 +5,7 @@ namespace sjtu {
     bpt<Station, TrainID> stationToID("Station_to_ID_File");
     bpt<TrainKey, int> dailySeat("Daily_Seat_File");
     MemoryRiver<RemainSeat, 0> remainSeats("Remain_Seats_File");
+    bpt<StartEndKey, StartEndVal> ticQry("Tic_Qry_File");
     int addtrain(const TrainID &trainID, int stationNum, int seatNum, const string& stations, const string& prices, \
                  const string& startTime, const string& travelTimes, const string& stopoverTimes, const string& saleDate, const string& typ) {
         Train nw = idToTrain.find(trainID);
@@ -42,9 +43,9 @@ namespace sjtu {
             dailySeat.insert(TrainKey(trainID, i), cnt);
         }
         //std::cout << '\n';
-        for (int i = 0; i < stationNum; i++) {
-            stationToID.insert(stationName[i], trainID);
-        }
+        // for (int i = 0; i < stationNum; i++) {
+        //     stationToID.insert(stationName[i], trainID);
+        // }
         return 0;
     }
     int deltrain(const TrainID &id) {
@@ -60,9 +61,9 @@ namespace sjtu {
             dailySeat.del(TrainKey(id, i), cnt);
         }
         idToTrain.del(id, nw);
-        for (int i = 0; i < nw.stationNum; i++) {
-            stationToID.del(nw.stations[i], id);
-        }
+        // for (int i = 0; i < nw.stationNum; i++) {
+        //     stationToID.del(nw.stations[i], id);
+        // }
         return 0;
     }
     int releasetrain(const TrainID &id) {
@@ -76,6 +77,9 @@ namespace sjtu {
         idToTrain.del(id, nw);
         nw.is_released = true;
         idToTrain.insert(id, nw);
+        for (int i = 0; i < nw.stationNum; i++) {
+            stationToID.insert(nw.stations[i], id);
+        }
         return 0;
     }
     int querytrain(const string &date, const TrainID &id) {
