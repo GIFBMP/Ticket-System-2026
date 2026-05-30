@@ -209,7 +209,8 @@ namespace sjtu {
                 }
             }
             if (ed_pos == 0) continue;
-            int nw_time = nw.startTime, ti[kMaxStation] = {0};
+            int nw_time = nw.startTime, ti[kMaxStation];
+            for (int i = 0; i < kMaxStation; i++) ti[i] = 0;
             for (int i = 0; i <= ed_pos; i++) {
                 if (i == ed_pos) ti[i] = nw_time; //arrival time
                 if (i > 0) nw_time += nw.stopoverTime[i];
@@ -220,11 +221,11 @@ namespace sjtu {
             tmp2.ticketNum = kInf;
             tmp2.trainID = x;
             tmp2.endStation = ed;
-            tmp2.endTime = ti[ed_pos];
             for (int i = ed_pos - 1; ~i; i--) {
                 tmp2.startStation = nw.stations[i];
                 tmp2.startTime = ti[i];
                 tmp2.ticketCost += nw.prices[i];
+                tmp2.endTime = ti[ed_pos];
                 if (!p.count(nw.stations[i])) continue;
                 for (auto tic : p[nw.stations[i]]) {
                     tmp1 = tic; int start_date1 = tmp1.date;
@@ -243,6 +244,13 @@ namespace sjtu {
                         }
                         int total_time = tmp2.endTime - tmp1.startTime;
                         int total_cost = tmp2.ticketCost + tmp1.ticketCost;
+                        // //test
+                        // if (tmp2.trainID == (TrainID)"Farfromtheclanko") {
+                        //     std::cout << tmp2.startStation << ' ' << tmp2.endStation << '\n';
+                        //     printTime(tmp2.startTime); std::cout << '\n';
+                        //     printTime(tmp2.endTime); std::cout << '\n';
+                        // }
+                        // //test
                         if (typ == 0) {//time
                             if (total_time < total || (total_time == total && total_cost < total2) ||\
                                (total_time == total && total_cost == total2 && tmp1.trainID < ans1.trainID) ||\
