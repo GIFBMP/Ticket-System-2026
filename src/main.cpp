@@ -23,7 +23,7 @@ void clear() {
     if (std::filesystem::exists("Name_to_User_File")) std::filesystem::remove("Name_to_User_File");
     if (std::filesystem::exists("Daily_Seat_File")) std::filesystem::remove("Daily_Seat_File");
     if (std::filesystem::exists("Remain_Seats_File")) std::filesystem::remove("Remain_Seats_File");
-    //if (std::filesystem::exists("Start_to_Train_File")) std::filesystem::remove("Start_to_Train_File");
+    if (std::filesystem::exists("Start_to_Train_File")) std::filesystem::remove("Start_to_Train_File");
     isLogin.clear();
     userToTicket.initialise("User_to_Ticket_File");
     tickets.initialise("Tickets_File");
@@ -34,7 +34,7 @@ void clear() {
     nameToUser.initialise("Name_to_User_File");
     dailySeat.initialise("Daily_Seat_File");
     remainSeats.initialise("Remain_Seats_File");
-    //startToTrain.initialise("Start_to_Train_File");
+    dateToTrain.initialise("Start_to_Train_File");
 }
 int main() {
     std::ios::sync_with_stdio(false);

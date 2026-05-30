@@ -82,6 +82,6 @@ namespace sjtu {
     extern bpt<Station, TrainID> stationToID;
     extern bpt<TrainKey, int> dailySeat;
     extern MemoryRiver<RemainSeat, 0> remainSeats;
-    //extern bpt<StartKey, TrainID> startToTrain;
+    extern bpt<int, TrainID> dateToTrain;
 }
 #endif

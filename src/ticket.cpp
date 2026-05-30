@@ -36,12 +36,15 @@ namespace sjtu {
     void query_ticket(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
         int Date = proceedDate(date);
         vector<TrainID> t1 = stationToID.multifind(st), 
-                        t2 = stationToID.multifind(ed), ret;
-        int l1 = t1.size(), l2 = t2.size();
-        for (int i = 0, j = 0; i < l1; i++) {
+                        t2 = stationToID.multifind(ed), 
+                        t3 = dateToTrain.multifind(Date), ret;
+        int l1 = t1.size(), l2 = t2.size(), l3 = t3.size();
+        for (int i = 0, j = 0, k = 0; i < l1; i++) {
             for (; j < l2 && t2[j] < t1[i]; j++);
             if (j == l2) break;
-            if (t2[j] == t1[i]) ret.push_back(t1[i]);
+            for (; k < l3 && t3[k] < t1[i]; k++);
+            if (k == l3) break;
+            if (t2[j] == t1[i] && t3[k] == t1[i]) ret.push_back(t1[i]);
         }
         Ticket tic;
         tic.startStation = st;
