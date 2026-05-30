@@ -66,8 +66,8 @@ namespace sjtu {
     void srt_by_cost(vector<Ticket> &v, int l, int r) {
         if (l >= r) return;
         int mid = ((l + r) >> 1);
-        srt_by_time(v, l, mid);
-        srt_by_time(v, mid + 1, r);
+        srt_by_cost(v, l, mid);
+        srt_by_cost(v, mid + 1, r);
         vector<Ticket> t1, t2;
         for (int i = l; i <= mid; i++) t1.push_back(v[i]);
         for (int i = mid + 1; i <= r; i++) t2.push_back(v[i]);
@@ -142,11 +142,11 @@ namespace sjtu {
                     q.push_back(tic);
                 }
             }
-            int len = q.size();
-            std::cout << len << '\n';
-            if (typ == 0) srt_by_time(q, 0, len - 1);
-            else srt_by_cost(q, 0, len - 1);
-            for (int i = 0; i < len; i++) std::cout << q[i] << '\n';
+        int len = q.size();
+        std::cout << len << '\n';
+        if (typ == 0) srt_by_time(q, 0, len - 1);
+        else srt_by_cost(q, 0, len - 1);
+        for (int i = 0; i < len; i++) std::cout << q[i] << '\n';
     }
     int query_transfer(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
         //Todo:: reconstruct!
