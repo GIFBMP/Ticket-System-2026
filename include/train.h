@@ -75,7 +75,7 @@ namespace sjtu {
      };
      struct StartEndVal {
          int st_pos, ed_pos, price;
-         int st_time, ed_time;
+         int st_time, ed_time, departdate;
          TrainID id;
          StartEndVal() = default;
          bool operator < (const StartEndVal &x) const {

@@ -42,10 +42,6 @@ namespace sjtu {
             int cnt = remainSeats.push(seat);
             dailySeat.insert(TrainKey(trainID, i), cnt);
         }
-        //std::cout << '\n';
-        // for (int i = 0; i < stationNum; i++) {
-        //     stationToID.insert(stationName[i], trainID);
-        // }
         return 0;
     }
     int deltrain(const TrainID &id) {
@@ -61,9 +57,6 @@ namespace sjtu {
             dailySeat.del(TrainKey(id, i), cnt);
         }
         idToTrain.del(id, nw);
-        // for (int i = 0; i < nw.stationNum; i++) {
-        //     stationToID.del(nw.stations[i], id);
-        // }
         return 0;
     }
     int releasetrain(const TrainID &id) {
@@ -79,6 +72,32 @@ namespace sjtu {
         idToTrain.insert(id, nw);
         for (int i = 0; i < nw.stationNum; i++) {
             stationToID.insert(nw.stations[i], id);
+        }
+        int nw_time = nw.startTime, arr[kMaxStation] = {0}, lev[kMaxStation] = {0};
+        for (int i = 0; i < nw.stationNum; i++) {
+            arr[i] = nw_time;
+            if (i > 0 && i < nw.stationNum - 1) nw_time += nw.stopoverTime[i];
+            lev[i] = nw_time;
+            nw_time += nw.travelTimes[i];
+        }
+        for (int ti = nw.saleStart; ti <= nw.saleEnd; ti += kMinPerDay) {
+            for (int i = 0; i < nw.stationNum; i++) {
+                int pri = nw.prices[i];
+                for (int j = i + 1; j < nw.stationNum; j++) {
+                    StartEndKey key; StartEndVal val;
+                    key.date = getDate(lev[i] + ti);
+                    key.st = nw.stations[i];
+                    key.ed = nw.stations[j];
+                    val.st_pos = i; val.ed_pos = j;
+                    val.st_time = lev[i] + ti;
+                    val.ed_time = arr[j] + ti;
+                    val.departdate = ti;
+                    val.id = id;
+                    val.price = pri;
+                    ticQry.insert(key, val);
+                    pri += nw.prices[j];
+                }
+            }
         }
         return 0;
     }

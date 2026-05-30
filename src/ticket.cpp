@@ -34,63 +34,28 @@ namespace sjtu {
         return out;
     }
     void query_ticket(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
-        vector<TrainID> t1 = stationToID.multifind(st), t2 = stationToID.multifind(ed), ret;
-        int l1 = t1.size(), l2 = t2.size();
-        for (int i = 0, j = 0; i < l1; i++) {
-            for (; j < l2 && t2[j] < t1[i]; j++);
-            if (j == l2) break;
-            if (t2[j] == t1[i]) ret.push_back(t1[i]);
-        }
+        int Date = proceedDate(date);
+        vector<StartEndVal> ret = ticQry.multifind(StartEndKey{st, ed, Date});
+        //std::cout << ret.size() << '\n';
         Ticket tic;
         tic.startStation = st;
         tic.endStation = ed;
-        int Date = proceedDate(date);
         //std::cout << typ << '\n';
         if (typ == 0) {//time
             priority_queue<Ticket, SortByTime> q;
             for (auto x : ret) {
-                Train nw = idToTrain.find(x);
-                
-                if (nw.is_released == false) continue;
-                int st_pos = -1, ed_pos = -1;
-                for (int i = 0; i < nw.stationNum; i++) {
-                    if (nw.stations[i] == st) st_pos = i;
-                    if (nw.stations[i] == ed) ed_pos = i;
-                }
-                if (ed_pos == -1 || ed_pos < st_pos) continue;
-                tic.trainID = x;
+                tic.startTime = x.st_time;
+                tic.endTime = x.ed_time;
+                tic.ticketCost = x.price;
+                tic.trainID = x.id;
                 tic.ticketNum = kInf;
-                tic.ticketCost = 0;
-                int nw_time = nw.startTime;
-                //std::cout << st_pos << ' ' << ed_pos << '\n';
-                for (int i = 0; i < nw.stationNum; i++) {
-                    if (i == ed_pos) {
-                        tic.endTime = nw_time;
-                        break;
-                    }
-                    if (i > 0) nw_time += nw.stopoverTime[i];
-                    if (i == st_pos) tic.startTime = nw_time;
-                    nw_time += nw.travelTimes[i];
-                    //std::cout << nw.travelTimes[i];
-                    if (i >= st_pos && i < ed_pos) {
-                        //tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                        tic.ticketCost += nw.prices[i];
-                    }
+                int st_pos = x.st_pos, ed_pos = x.ed_pos;
+                RemainSeat seat;
+                remainSeats.read(seat, dailySeat.find(TrainKey(x.id, x.departdate)));
+                for (int i = st_pos; i < ed_pos; i++) {
+                    tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                 }
-                //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
-                int delta = tic.endTime - tic.startTime;
-                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
-                    int tmp = tic.startTime;
-                    tic.startTime = tic.startTime % kMinPerDay + Date;
-                    tic.endTime = tic.startTime + delta;
-                    int start_date = tic.startTime - tmp;
-                    RemainSeat seat;
-                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                    for (int i = st_pos; i < ed_pos; i++) {
-                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                    }
-                    q.push(tic);
-                }
+                q.push(tic);
             }
             std::cout << q.size() << '\n';
             while (!q.empty()) {
@@ -101,48 +66,18 @@ namespace sjtu {
         else {
             priority_queue<Ticket, SortByCost> q;
             for (auto x : ret) {
-                Train nw = idToTrain.find(x);
-                
-                if (nw.is_released == false) continue;
-                int st_pos = -1, ed_pos = -1;
-                for (int i = 0; i < nw.stationNum; i++) {
-                    if (nw.stations[i] == st) st_pos = i;
-                    if (nw.stations[i] == ed) ed_pos = i;
-                }
-                if (ed_pos == -1 || ed_pos < st_pos) continue;
-                tic.trainID = x;
+                tic.startTime = x.st_time;
+                tic.endTime = x.ed_time;
+                tic.ticketCost = x.price;
+                tic.trainID = x.id;
                 tic.ticketNum = kInf;
-                tic.ticketCost = 0;
-                int nw_time = nw.startTime;
-                //std::cout << st_pos << ' ' << ed_pos << '\n';
-                for (int i = 0; i < nw.stationNum; i++) {
-                    if (i == ed_pos) {
-                        tic.endTime = nw_time;
-                        break;
-                    }
-                    if (i > 0) nw_time += nw.stopoverTime[i];
-                    if (i == st_pos) tic.startTime = nw_time;
-                    nw_time += nw.travelTimes[i];
-                    //std::cout << nw.travelTimes[i];
-                    if (i >= st_pos && i < ed_pos) {
-                        //tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                        tic.ticketCost += nw.prices[i];
-                    }
+                int st_pos = x.st_pos, ed_pos = x.ed_pos;
+                RemainSeat seat;
+                remainSeats.read(seat, dailySeat.find(TrainKey(x.id, x.departdate)));
+                for (int i = st_pos; i < ed_pos; i++) {
+                    tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                 }
-                //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
-                int delta = tic.endTime - tic.startTime;
-                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
-                    int tmp = tic.startTime;
-                    tic.startTime = tic.startTime % kMinPerDay + Date;
-                    tic.endTime = tic.startTime + delta;
-                    int start_date = tic.startTime - tmp;
-                    RemainSeat seat;
-                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                    for (int i = st_pos; i < ed_pos; i++) {
-                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                    }
-                    q.push(tic);
-                }
+                q.push(tic);
             }
             std::cout << q.size() << '\n';
             while (!q.empty()) {
