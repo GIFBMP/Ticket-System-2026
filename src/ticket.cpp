@@ -159,6 +159,7 @@ namespace sjtu {
         map<Station, vector<Ticket> > p;
         for (auto x : ret) {
             Train nw = idToTrain.find(x);
+            if (nw.is_released == false) continue;
             int st_pos = -1;
             for (int i = 0; i < nw.stationNum; i++) {
                 if (nw.stations[i] == st) {
@@ -173,6 +174,11 @@ namespace sjtu {
                 if (i == st_pos) tmp1.startTime = nw_time;
                 nw_time += nw.travelTimes[i];
             }
+            // if (x == (TrainID)"Thoseofmechanics") {
+            //     for (int i = 0; i < nw.stationNum; i++) std::cout << nw.travelTimes[i] << ' ';
+            //     std::cout << '\n';
+            //     std::cout << nw.startTime << ' ' << tmp1.startTime << '\n';
+            // }
             tmp1.startStation = st;
             tmp1.trainID = x;
             tmp1.ticketCost = nw.prices[st_pos];
@@ -201,6 +207,7 @@ namespace sjtu {
         ret = stationToID.multifind(ed);
         for (auto x : ret) {
             Train nw = idToTrain.find(x);
+            if (nw.is_released == false) continue;
             int ed_pos = -1;
             for (int i = 0; i < nw.stationNum; i++) {
                 if (nw.stations[i] == ed) {
@@ -223,16 +230,16 @@ namespace sjtu {
             tmp2.endStation = ed;
             for (int i = ed_pos - 1; ~i; i--) {
                 tmp2.startStation = nw.stations[i];
-                tmp2.startTime = ti[i];
                 tmp2.ticketCost += nw.prices[i];
-                tmp2.endTime = ti[ed_pos];
                 if (!p.count(nw.stations[i])) continue;
                 for (auto tic : p[nw.stations[i]]) {
                     tmp1 = tic; int start_date1 = tmp1.date;
                     if (tmp1.trainID == x) continue;
+                    tmp2.startTime = ti[i];
+                    tmp2.endTime = ti[ed_pos];
+                    tmp2.ticketNum = kInf;
                     if (tmp1.endTime <= tmp2.startTime + nw.saleEnd) {
                         int extra_min = ((tmp1.endTime - tmp2.startTime + kMinPerDay - 1) / kMinPerDay) * kMinPerDay;
-                        //int tmp_train2 = tmp2.startTime;
                         tmp2.startTime += max(nw.saleStart, extra_min);
                         tmp2.endTime += max(nw.saleStart, extra_min);
                         tmp2.endStation = ed;
@@ -244,13 +251,6 @@ namespace sjtu {
                         }
                         int total_time = tmp2.endTime - tmp1.startTime;
                         int total_cost = tmp2.ticketCost + tmp1.ticketCost;
-                        // //test
-                        // if (tmp2.trainID == (TrainID)"Farfromtheclanko") {
-                        //     std::cout << tmp2.startStation << ' ' << tmp2.endStation << '\n';
-                        //     printTime(tmp2.startTime); std::cout << '\n';
-                        //     printTime(tmp2.endTime); std::cout << '\n';
-                        // }
-                        // //test
                         if (typ == 0) {//time
                             if (total_time < total || (total_time == total && total_cost < total2) ||\
                                (total_time == total && total_cost == total2 && tmp1.trainID < ans1.trainID) ||\
@@ -260,6 +260,7 @@ namespace sjtu {
                                     total2 = total_cost;
                                     ans1 = tmp1;
                                     ans2 = tmp2;
+                                    //std::cout << "modified: " << ans1 << ' ' << ans2 << '\n';
                                 }
                         }
                         else {//cost
