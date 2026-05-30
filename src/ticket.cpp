@@ -33,6 +33,55 @@ namespace sjtu {
         out << ' ' << x.ticketCost << ' ' << x.ticketNum;
         return out;
     }
+    bool sortByTime (const Ticket &x, const Ticket &y) {
+        if (x.endTime - x.startTime != y.endTime - y.startTime) {
+            return x.endTime - x.startTime < y.endTime - y.startTime;
+        }
+        return x.trainID <= y.trainID;
+    }
+    bool sortByCost (const Ticket &x, const Ticket &y) {
+        if (x.ticketCost != y.ticketCost) {
+            return x.ticketCost < y.ticketCost;
+        }
+        return x.trainID <= y.trainID;
+    }
+    void srt_by_time(vector<Ticket> &v, int l, int r) {
+        if (l >= r) return;
+        int mid = ((l + r) >> 1);
+        srt_by_time(v, l, mid);
+        srt_by_time(v, mid + 1, r);
+        vector<Ticket> t1, t2;
+        for (int i = l; i <= mid; i++) t1.push_back(v[i]);
+        for (int i = mid + 1; i <= r; i++) t2.push_back(v[i]);
+        int p1 = 0, p2 = 0, vp = l;
+        while (p1 < mid - l + 1 && p2 < r - mid) {
+            while (p1 < mid - l + 1 && sortByTime(t1[p1], t2[p2])) v[vp++] = t1[p1++];
+            if (p1 == mid - l + 1) break;
+            while (p2 < r - mid && sortByTime(t2[p2], t1[p1])) v[vp++] = t2[p2++];
+            if (p2 == r - mid) break;
+        }
+        while (p1 < mid - l + 1) v[vp++] = t1[p1++];
+        while (p2 < r - mid) v[vp++] = t2[p2++];
+    }
+    void srt_by_cost(vector<Ticket> &v, int l, int r) {
+        if (l >= r) return;
+        int mid = ((l + r) >> 1);
+        srt_by_time(v, l, mid);
+        srt_by_time(v, mid + 1, r);
+        vector<Ticket> t1, t2;
+        for (int i = l; i <= mid; i++) t1.push_back(v[i]);
+        for (int i = mid + 1; i <= r; i++) t2.push_back(v[i]);
+        int p1 = 0, p2 = 0, vp = l;
+        while (p1 < mid - l + 1 && p2 < r - mid) {
+            while (p1 < mid - l + 1 && sortByCost(t1[p1], t2[p2])) v[vp++] = t1[p1++];
+            if (p1 == mid - l + 1) break;
+            while (p2 < r - mid && sortByCost(t2[p2], t1[p1])) v[vp++] = t2[p2++];
+            if (p2 == r - mid) break;
+        }
+        //std::cerr << p1 << ' ' << p2 << ' ' << r << '\n';
+        while (p1 < mid - l + 1) v[vp++] = t1[p1++];
+        while (p2 < r - mid) v[vp++] = t2[p2++];
+    }
     void query_ticket(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
         int Date = proceedDate(date);
         vector<TrainID> t1 = stationToID.multifind(st), 
@@ -49,8 +98,7 @@ namespace sjtu {
         Ticket tic;
         tic.startStation = st;
         tic.endStation = ed;
-        if (typ == 0) {//time
-            priority_queue<Ticket, SortByTime> q;
+        vector<Ticket> q;
             for (auto x : ret) {
                 Train nw = idToTrain.find(x);
                 if (nw.is_released == false) continue;
@@ -91,66 +139,14 @@ namespace sjtu {
                     for (int i = st_pos; i < ed_pos; i++) {
                         tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
                     }
-                    q.push(tic);
+                    q.push_back(tic);
                 }
             }
-            std::cout << q.size() << '\n';
-            while (!q.empty()) {
-                std::cout << q.top() << '\n';
-                q.pop();
-            }
-        }
-        else {
-            priority_queue<Ticket, SortByCost> q;
-            for (auto x : ret) {
-                Train nw = idToTrain.find(x);
-                if (nw.is_released == false) continue;
-                int st_pos = -1, ed_pos = -1;
-                for (int i = 0; i < nw.stationNum; i++) {
-                    if (nw.stations[i] == st) st_pos = i;
-                    if (nw.stations[i] == ed) ed_pos = i;
-                }
-                if (ed_pos == -1 || ed_pos < st_pos) continue;
-                tic.trainID = x;
-                tic.ticketNum = kInf;
-                tic.ticketCost = 0;
-                int nw_time = nw.startTime;
-                //std::cout << st_pos << ' ' << ed_pos << '\n';
-                for (int i = 0; i < nw.stationNum; i++) {
-                    if (i == ed_pos) {
-                        tic.endTime = nw_time;
-                        break;
-                    }
-                    if (i > 0) nw_time += nw.stopoverTime[i];
-                    if (i == st_pos) tic.startTime = nw_time;
-                    nw_time += nw.travelTimes[i];
-                    //std::cout << nw.travelTimes[i];
-                    if (i >= st_pos && i < ed_pos) {
-                        //tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                        tic.ticketCost += nw.prices[i];
-                    }
-                }
-                //std::cout << tic.startTime << ' ' << tic.endTime << '\n';
-                int delta = tic.endTime - tic.startTime;
-                if (getDate(nw.saleStart + tic.startTime) <= Date && Date <= getDate(nw.saleEnd + tic.startTime)) {
-                    int tmp = tic.startTime;
-                    tic.startTime = tic.startTime % kMinPerDay + Date;
-                    tic.endTime = tic.startTime + delta;
-                    int start_date = tic.startTime - tmp;
-                    RemainSeat seat;
-                    remainSeats.read(seat, dailySeat.find(TrainKey(x, start_date)));
-                    for (int i = st_pos; i < ed_pos; i++) {
-                        tic.ticketNum = min(tic.ticketNum, seat.seatNum[i]);
-                    }
-                    q.push(tic);
-                }
-            }
-            std::cout << q.size() << '\n';
-            while (!q.empty()) {
-                std::cout << q.top() << '\n';
-                q.pop();
-            }
-        }
+            int len = q.size();
+            std::cout << len << '\n';
+            if (typ == 0) srt_by_time(q, 0, len - 1);
+            else srt_by_cost(q, 0, len - 1);
+            for (int i = 0; i < len; i++) std::cout << q[i] << '\n';
     }
     int query_transfer(const Station &st, const Station &ed, const string &date, int typ = 0) {//typ 0:time 1:cost
         //Todo:: reconstruct!
