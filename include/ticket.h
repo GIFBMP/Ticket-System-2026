@@ -31,17 +31,17 @@ namespace sjtu {
     struct SortByTime {
         bool operator () (const Ticket &x, const Ticket &y) {
             if (x.endTime - x.startTime != y.endTime - y.startTime) {
-                return x.endTime - x.startTime < y.endTime - y.startTime;
+                return x.endTime - x.startTime > y.endTime - y.startTime;
             }
-            return x.trainID < y.trainID;
+            return y.trainID < x.trainID;
         }
     };
     struct SortByCost {
         bool operator () (const Ticket &x, const Ticket &y) {
             if (x.ticketCost != y.ticketCost) {
-                return x.ticketCost < y.ticketCost;
+                return x.ticketCost > y.ticketCost;
             }
-            return x.trainID < y.trainID;
+            return y.trainID < x.trainID;
         }
     };
     
