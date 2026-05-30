@@ -21,11 +21,11 @@ namespace sjtu {
     public:
         void initialise(std::string FN = "") {
             if (FN != "")file_name = FN;
-            file.open(file_name, std::ios::in | std::ios::out);
+            file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
             if (file.is_open()) return;
-            file.open(file_name, std::ios::out);
+            file.open(file_name, std::ios::out | std::ios::binary);
             file.close();
-            file.open(file_name, std::ios::in | std::ios::out);
+            file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
             int tmp = 0;
             for (int i = 0; i < info_len; ++i) {
                 file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
@@ -87,7 +87,7 @@ namespace sjtu {
                 return a == t.a ? b <= t.b : a <= t.a;
             }
         };
-        static const int kMaxSize = 83;
+        static const int kMaxSize = 163;
         static const int kMinSize = (kMaxSize + 1) / 2;
         struct Node {
             ValuePair data[kMaxSize + 1];
