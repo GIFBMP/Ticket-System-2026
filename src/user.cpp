@@ -74,7 +74,7 @@ namespace sjtu {
         }
         if (cur == usrname) {
             User nw = nameToUser.find(usrname);
-            if (nw.privilege <= privilege) return -1;
+            if (privilege >= 0 && nw.privilege <= privilege) return -1;
             nameToUser.del(usrname, nw);
             if (!pwd.empty()) nw.password = pwd;
             if (!name.empty()) nw.name = name;
@@ -86,7 +86,7 @@ namespace sjtu {
         }//self-modify
         User cur_user = nameToUser.find(cur);
         User nw = nameToUser.find(usrname);
-        if (cur_user.privilege <= privilege) return -1;
+        if (privilege >= 0 && cur_user.privilege <= privilege) return -1;
         if (nw.username.empty() || cur_user.privilege <= nw.privilege) {
             // if (nw.username.empty()) std::cerr << "not exist\n";
             // else std::cerr << "not enough privilege\n";

@@ -64,7 +64,7 @@ int main() {
             Usrname usrname, cur, name;
             Mail mailaddr;
             Pwd pwd;
-            int privilege;
+            int privilege = -1;
             for (int i = 2; i < len; i += 2) {
                 if (v[i] == "-c") cur = v[i + 1];
                 if (v[i] == "-u") usrname = v[i + 1];
