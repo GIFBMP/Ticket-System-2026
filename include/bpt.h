@@ -87,7 +87,7 @@ namespace sjtu {
                 return a == t.a ? b <= t.b : a <= t.a;
             }
         };
-        static const int kMaxSize = 4096 / sizeof(ValuePair) - 1 < 3 ? 3 : 4096 / sizeof(ValuePair);
+        static const int kMaxSize = 16384 / sizeof(ValuePair);
         static const int kMinSize = (kMaxSize + 1) / 2;
         struct Node {
             ValuePair data[kMaxSize + 1];
