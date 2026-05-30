@@ -10,3 +10,5 @@ Name_to_User_File
 Daily_Seat_File
 Remain_Seats_File
 tee.out
+*.bash
+callgrind.out.*

@@ -228,6 +228,7 @@ namespace sjtu {
                 if (!p.count(nw.stations[i])) continue;
                 for (auto tic : p[nw.stations[i]]) {
                     tmp1 = tic; int start_date1 = tmp1.date;
+                    if (tmp1.trainID == x) continue;
                     if (tmp1.endTime <= tmp2.startTime + nw.saleEnd) {
                         int extra_min = ((tmp1.endTime - tmp2.startTime + kMinPerDay - 1) / kMinPerDay) * kMinPerDay;
                         //int tmp_train2 = tmp2.startTime;
