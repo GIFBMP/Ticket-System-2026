@@ -1,9 +1,0 @@
-rm User_to_Ticket_File
-rm Tickets_File
-rm Train_to_Pending_Ticket_File
-rm Ticket_to_Train_File
-rm ID_to_Train_File
-rm Station_to_ID_File
-rm Name_to_User_File
-rm Daily_Seat_File
-rm Remain_Seats_File
