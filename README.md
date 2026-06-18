@@ -1,78 +1,72 @@
-# 火车票管理系统
+### 仓库结构
 
-SJTU CS1951 课程大作业
+```include/```
 
-## 概况
+- `baseclass.h`
 
-### 作业安排
+- `bpt.h`
 
+- `exceptions.h`
 
-本作业分为两个部分。
+- `lexer.h`
 
-在第一部分中，需要实现一个基于文件的 B+ 树。
+- `map.h`
 
-在第二部分中，需要实现一个火车票管理系统。此部分要求使用 Git 开发，维持良好的项目管理习惯。此部分的中期检查等检查方式均会通过查看登记的 Git 仓库链接，因此如果想更换仓库的链接请及时联系助教。
+- `priority_queue.h`
 
-### 作业周期
+- `ticket.h`
 
-- B+ 树: 2026-04-27（第 9 周周一）~ 2025-05-25（第 13 周周一）
+- `train.h`
+- `user.h`
+- `utility.h`
+- `vector.h`
 
-## 评分标准
+```src/```
 
-本作业占本课程总成绩 15%，其中 B+ 树占 7%，管理系统占 8%。
+- `baseclass.cpp`
 
-- B+ 树: 7%
-  - OJ 测试（仅题 [3091](https://acm.sjtu.edu.cn/OnlineJudge/problem/3091)，不含压力测试）: 80%
-  - Code Review: 20%
+- `lexer.cpp`
+- `main.cpp`
+- `ticket.cpp`
+- `train.cpp`
+- `user.cpp`
 
-bonus 另外计算，计入平时分总分，且不超过总分的 1%。
+###  文件概述
 
-## B+ 树 - 7%
+`map.h`， `priority_queue.h`，`vector.h`，`utility.h` 实现了与 STL 相似的功能
 
-### 作业要求
+`bpt.h` 实现了一个 B+ 树，用于在外存中存储数据
 
-作业要求实现基于 BPT 的外存管理系统。在本作业中，只允许调用以下头文件中的函数和类：
+`baseclass.h`，`baseclass.cpp` 实现了一些基本的函数，时间与日期间的转换，以及日期的输出
 
-iostream, string, cstdio, cmath, string, fstream, filesystem
+`user.h`，`user.cpp` 实现了用户类和管理系统用户的基本功能（登录，创建，查询等）
 
-不允许使用这些头文件包含的 STL 容器 (如 `std::vector`) 或算法 (如 `std::sort`)。唯一的例外是，你可以使用 `std::string`。如果需要用到其他与算法、数据结构无关的标准库，请向助教提出请求。
+`lexer.h`，`lexer.cpp` 实现了对输入指令的词元拆分，以及将字符串转为整数的功能
 
-你需要在最后通过 [OJ 测试](https://acm.sjtu.edu.cn/OnlineJudge/problem/3091)。
+`train.h`，`train.cpp` 实现了火车类和车次的基本操作
 
-注意：建议使用类模板以方便后续完成管理系统。
+`ticket.h`，`ticket.cpp` 实现了车票类和购票，查询，退票等基本功能
 
-### 负责助教
+### 数据库概述
 
-张博钜 张煊 丁宣铭
+用 B+ 树存储信息。
 
-## 管理系统 - 8%
+`bpt<Usrname, User> nameToUser`：存储用户名到用户信息的映射
 
-见 [管理系统文档](management_system.md)。
+`bpt<TrainID, Train> idToTrain`：存储车次到火车信息的映射
 
-数据压缩包下发在群里。
+`bpt<Station, TrainID> stationToID`：存储车站到车次的映射
 
-### 负责助教
-顾元熙，卓翔，楼灏，于恩帝
+`bpt<TrainKey, int> dailySeat`：存储车次和日期构成的二元组到一个动态下标的映射
 
+`MemoryRiver<RemainSeat, 0> remainSeats`：存储上面的动态下标到座位数的映射
 
-## Bonus
+`bpt<int, TrainID> dateToTrain`：存储日期到车次的映射
 
-见 [Bonus 文档](bonus.md)。
+`bpt<Usrname, int> userToTicket`：存储用户到车票的动态下标的映射
 
-准备自行设计并实现其他 bonus 的同学可以联系助教协商。
+`bpt<TrainKey, int> trainToPendingTicket`：存储车次和日期构成的二元组到对应车票的动态下标的映射
 
-## 扣分
+`MemoryRiver<Ticket, 0> tickets` 存储车票动态下标到车票的映射
 
-请保证自己项目结构的可读性，可以包括优化项目结构、完善 README 的内容、适当的文件树指南等，晦涩难懂的项目可能会加大助教的工作量，也可能会影响你的成绩（B+ 树阶段此条可忽略）。
-
-**如有出现任何抄袭现象按 0 分计，并按照违反学术诚信的操作办法处理。**
-
-
-### 中期检查
-
-由于火车票后端设计难度较大，请同学们 **务必** 在设计好清晰的文件结构以及代码框架后再动手。
-为了督促同学们的完成进度，我们将在 **6月4日（星期四）** 进行一次中期检查，检查内容包含：
-- 仓库代码，要求建好各模块的文件，设计好基本的类（包含数据成员）以及几个基本的函数接口（要求有函数签名）
-- 口头回答对 `query_transfer` 的设计
-中期检查效果不理想的同学可能会被扣除5%以内的分数。
-  
+`MemoryRiver<TrainID, 0> ticketToTrain` 存储车票动态下标到车次的映射
